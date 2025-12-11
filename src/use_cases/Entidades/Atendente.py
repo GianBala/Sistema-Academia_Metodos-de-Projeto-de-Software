@@ -1,4 +1,4 @@
-from use_cases.Entidades.Funcionario import Funcionario
+from src.use_cases.Entidades.Funcionario import Funcionario
 
 class Atendente(Funcionario):
 

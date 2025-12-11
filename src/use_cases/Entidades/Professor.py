@@ -1,5 +1,5 @@
-from use_cases.Entidades.Funcionario import Funcionario
-from use_cases.Entidades.Aluno import Aluno
+from src.use_cases.Entidades.Funcionario import Funcionario
+from src.use_cases.Entidades.Aluno import Aluno
 from typing import List, Optional
 
 class Professor(Funcionario):

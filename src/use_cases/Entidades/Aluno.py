@@ -1,5 +1,5 @@
 from typing import Optional
-from use_cases.Entidades.Entidade import Entidade
+from src.use_cases.Entidades.Entidade import Entidade
 
 class Aluno(Entidade):
 

@@ -1,3 +1,3 @@
-from src.user_interface.MenuPrincipal import MenuPrincipal
+from src.user_interface.Menu_Principal import MenuPrincipal
 
 MenuPrincipal.menu_principal()

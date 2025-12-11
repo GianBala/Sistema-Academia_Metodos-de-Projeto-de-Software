@@ -1,9 +1,12 @@
 import os
-from src.user_interface.MenuCadastrarUsuario import MenuCadastrarUsuario
-from src.user_interface.MenuListarUsuario import MenuListarUsuario
+from src.user_interface.Menu_Cadastrar_Usuario import MenuCadastrarUsuario
+from src.user_interface.Menu_Listar_Usuario import MenuListarUsuario
 
 class MenuPrincipal:
+    
+    @staticmethod
     def menu_principal():
+        
         print("=== Menu Principal ===")
         print("1. Cadastrar Usuario")
         print("2. Listar Usuarios")
