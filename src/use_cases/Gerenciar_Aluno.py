@@ -11,6 +11,7 @@ class Gerenciar_Aluno():
     
     def cadastrar_aluno(self, nome: str, dt_nascimento: str, email: str):
         novo_aluno = Aluno(nome, dt_nascimento, email)
+        Gerenciar_Aluno.listar_alunos.append(novo_aluno)
         return
     
  

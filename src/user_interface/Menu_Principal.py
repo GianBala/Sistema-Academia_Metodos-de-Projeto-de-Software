@@ -7,7 +7,7 @@ class Menu_Principal:
     def __init__(self):
         pass
 
-    def menu_principal():
+    def run():
         print("=== Menu Principal ===")
         print("1. Cadastrar Usuario")
         print("2. Listar Usuarios")
@@ -29,7 +29,7 @@ class Menu_Principal:
         else:
             
             print("Opção inválida. Tente novamente.\n")
-            Menu_Principal.menu_principal()
+            Menu_Principal.run()
     
 
 

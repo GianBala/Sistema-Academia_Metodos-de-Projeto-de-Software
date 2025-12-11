@@ -21,6 +21,6 @@ class Menu_Cadastro:
 
         os.system("cls")
 
-        Menu_Principal.menu_principal()
+        Menu_Principal.run()
 
         return
