@@ -1,8 +1,7 @@
-from use_cases.Entidades.Aluno import Aluno
-from use_cases.Entidades.Funcionario import Funcionario
-from use_cases.Entidades.Professor import Professor
-from use_cases.Entidades.Atendente import Atendente
-from use_cases.Entidades.Administrador import Admnistrador
+from use_cases.Gerenciadores.Gerenciador_Administradores import GerenciadorAdministradores
+from use_cases.Gerenciadores.Gerenciador_Alunos import GerenciadorAlunos
+from src.use_cases.Gerenciadores.Gerenciador_Atendentes import GerenciadorAtendentes
+from src.use_cases.Gerenciadores.Gerenciador_Professores import GerenciadorProfessores
 from src.user_interface.MenuPrincipal import MenuPrincipal
 import os
 
@@ -18,19 +17,19 @@ class MenuCadastrarUsuario:
 
             if tipo == "1":
                 senha = input("Senha: ").strip()
-                novo_usuario = Admnistrador(nome, dt_nascimento, email, senha)
+                GerenciadorAdministradores.cadastrar_usuario(nome, dt_nascimento, email, senha)
 
             elif tipo == "2":
-                novo_usuario = Aluno(nome, dt_nascimento, email, matricula=1)
+                novo_usuario = GerenciadorAlunos.cadastrar_usuario(nome, dt_nascimento, email, matricula=1)
 
             elif tipo == "3":
                 tipo_funcionario = input("Tipo de Funcionario (1-Professor, 2-Atendente): ")
                 
                 if tipo_funcionario == "1":
-                    novo_usuario = Professor(nome, dt_nascimento, email)
+                    novo_usuario = GerenciadorProfessores.cadastrar_usuario(nome, dt_nascimento, email)
 
                 elif tipo_funcionario == "2":
-                    novo_usuario = Atendente(nome, dt_nascimento, email)
+                    novo_usuario = GerenciadorAtendentes.cadastrar_usuario(nome, dt_nascimento, email)
             
             else:
                 print("Tipo de usuario inválido.")

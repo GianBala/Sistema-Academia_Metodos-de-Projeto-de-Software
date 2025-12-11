@@ -3,12 +3,9 @@ from datetime import date, datetime
 from dateutil.relativedelta import relativedelta
 
 class Funcionario(Entidade):
-    lista_registros = []
 
     def __init__(self, nome: str, dt_nascimento: str, email: str):
         super().__init__(nome, dt_nascimento,email)
-
-        Funcionario.lista_registros.append(self)
 
     @Entidade.dt_nascimento.setter
     def dt_nascimento(self, data: str):

@@ -2,15 +2,12 @@ from datetime import datetime, date
 from dateutil.relativedelta import relativedelta
 
 class Entidade:
-    lista_registros = []
     
     def __init__(self, nome: str, dt_nascimento: str, email: str):
         self.id = 0
         self._nome = nome.strip().title()
         self.dt_nascimento = dt_nascimento
         self.email = email
-
-        Entidade.lista_registros.append(self)
 
     @property
     def nome(self) -> str:
@@ -64,6 +61,3 @@ class Entidade:
     def infos(self) -> str:
         return f"Nome: {self.nome}, Idade: {self.idade}, Email: {self.email}, Cargo: {self.__class__.__name__}"
     
-    @classmethod
-    def listar_usuarios(cls) -> str:
-        return "\n".join([funcionario.infos() for funcionario in cls.lista_registros]) 

@@ -1,13 +1,10 @@
 from use_cases.Entidades.Entidade import Entidade
 
-class Admnistrador(Entidade):
-    lista_registros = []
+class Administrador(Entidade):
 
     def __init__(self, nome: str, dt_nascimento: str, email: str, senha : str):
         super().__init__(nome, dt_nascimento, email)
         self.senha = senha
-        
-        Admnistrador.lista_registros.append(self)
 
     @property
     def senha(self) -> str:

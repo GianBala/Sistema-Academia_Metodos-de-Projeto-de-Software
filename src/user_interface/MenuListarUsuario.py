@@ -1,28 +1,24 @@
 import os
-from use_cases.Entidades.Aluno import Aluno
-from use_cases.Entidades.Funcionario import Funcionario
-from use_cases.Entidades.Professor import Professor
-from use_cases.Entidades.Atendente import Atendente
-from use_cases.Entidades.Administrador import Admnistrador
+from use_cases.Gerenciadores.Gerenciador_Administradores import GerenciadorAdministradores
+from use_cases.Gerenciadores.Gerenciador_Alunos import GerenciadorAlunos
+from src.use_cases.Gerenciadores.Gerenciador_Atendentes import GerenciadorAtendentes
+from src.use_cases.Gerenciadores.Gerenciador_Professores import GerenciadorProfessores
 from src.user_interface.MenuPrincipal import MenuPrincipal
 
 class MenuListarUsuario:
     def menu_listar_usuarios():
         print("=== Listar Usuarios ===")
         print("1. Listar Alunos")
-        print("2. Listar Funcionarios")
-        print("3. Listar Todos")
-        print("4. Voltar ao Menu Principal")
+        print("2. Listar Todos")
+        print("3. Voltar ao Menu Principal")
         
         escolha = input("Escolha uma opção: ").strip()
         try:
             if escolha == "1":
-                print(Aluno.listar_usuarios())
+                print(GerenciadorAlunos.listar_usuarios())
             elif escolha == "2":
-                print(Funcionario.listar_usuarios())
+                print(GerenciadorAdministradores.listar_usuarios() + "\n" + GerenciadorAlunos.listar_usuarios() + "\n" + GerenciadorProfessores.listar_usuarios() + "\n" + GerenciadorAtendentes.listar_usuarios() + "\n")
             elif escolha == "3":
-                print(Admnistrador.listar_usuarios() + "\n" + Aluno.listar_usuarios() + "\n" + Professor.listar_usuarios() + "\n" + Atendente.listar_usuarios() + "\n")
-            elif escolha == "4":
                 os.system("cls")
                 MenuPrincipal.menu_principal()
                 return

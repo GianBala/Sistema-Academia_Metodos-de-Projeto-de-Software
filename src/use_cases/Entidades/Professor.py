@@ -3,7 +3,6 @@ from use_cases.Entidades.Aluno import Aluno
 from typing import List, Optional
 
 class Professor(Funcionario):
-    lista_registros = []
 
     def __init__(self, nome: str, idade: int, email: str, alunos : Optional[List[Aluno]] = None):
         super().__init__(nome, idade, email)
@@ -12,8 +11,6 @@ class Professor(Funcionario):
             alunos = []
 
         self.alunos = alunos
-        
-        Professor.lista_registros.append(self)
 
     def adicionar_aluno(self, aluno: Aluno):
         self.alunos.append(aluno)
