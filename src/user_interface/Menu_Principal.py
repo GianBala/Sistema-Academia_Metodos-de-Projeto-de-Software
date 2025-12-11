@@ -18,7 +18,7 @@ class Menu_Principal:
         os.system("cls")
 
         if escolha == "1":
-            menu_cadastrar_usuario()
+            Menu_Cadastro.menu_cadastrar_usuario()
         elif escolha == "2":
             Gerenciar_Aluno.listar_alunos()
             input("\nPressione Enter para continuar...")
