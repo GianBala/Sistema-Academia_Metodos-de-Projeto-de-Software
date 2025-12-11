@@ -1,4 +1,4 @@
-from src.use_cases.Entidade import Entidade
+from use_cases.Entidades.Entidade import Entidade
 
 class Admnistrador(Entidade):
     lista_registros = []

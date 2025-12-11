@@ -1,5 +1,5 @@
 from typing import List, Optional
-from src.use_cases.Entidade import Entidade
+from use_cases.Entidades.Entidade import Entidade
 
 class Aluno(Entidade):
     lista_registros = []

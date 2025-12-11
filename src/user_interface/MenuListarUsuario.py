@@ -1,9 +1,9 @@
 import os
-from src.use_cases.Aluno import Aluno
-from src.use_cases.Funcionario import Funcionario
-from src.use_cases.Professor import Professor
-from src.use_cases.Atendente import Atendente
-from src.use_cases.Administrador import Admnistrador
+from use_cases.Entidades.Aluno import Aluno
+from use_cases.Entidades.Funcionario import Funcionario
+from use_cases.Entidades.Professor import Professor
+from use_cases.Entidades.Atendente import Atendente
+from use_cases.Entidades.Administrador import Admnistrador
 from src.user_interface.MenuPrincipal import MenuPrincipal
 
 class MenuListarUsuario:
@@ -17,11 +17,11 @@ class MenuListarUsuario:
         escolha = input("Escolha uma opção: ").strip()
         try:
             if escolha == "1":
-                print(Aluno.listar_funcionarios())
+                print(Aluno.listar_usuarios())
             elif escolha == "2":
-                print(Funcionario.listar_funcionarios())
+                print(Funcionario.listar_usuarios())
             elif escolha == "3":
-                print(Admnistrador.listar_funcionarios() + "\n" + Aluno.listar_funcionarios() + "\n" + Professor.listar_funcionarios() + "\n" + Atendente.listar_funcionarios() + "\n")
+                print(Admnistrador.listar_usuarios() + "\n" + Aluno.listar_usuarios() + "\n" + Professor.listar_usuarios() + "\n" + Atendente.listar_usuarios() + "\n")
             elif escolha == "4":
                 os.system("cls")
                 MenuPrincipal.menu_principal()

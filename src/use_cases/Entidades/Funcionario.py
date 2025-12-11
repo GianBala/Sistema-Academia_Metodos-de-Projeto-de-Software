@@ -1,4 +1,4 @@
-from src.use_cases.Entidade import Entidade
+from use_cases.Entidades.Entidade import Entidade
 from datetime import date, datetime
 from dateutil.relativedelta import relativedelta
 

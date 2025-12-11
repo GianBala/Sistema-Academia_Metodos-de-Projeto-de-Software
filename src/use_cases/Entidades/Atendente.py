@@ -1,5 +1,5 @@
-from src.use_cases.Funcionario import Funcionario
-from src.use_cases.Aluno import Aluno
+from use_cases.Entidades.Funcionario import Funcionario
+from use_cases.Entidades.Aluno import Aluno
 from typing import List, Optional
 
 class Atendente(Funcionario):

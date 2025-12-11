@@ -65,5 +65,5 @@ class Entidade:
         return f"Nome: {self.nome}, Idade: {self.idade}, Email: {self.email}, Cargo: {self.__class__.__name__}"
     
     @classmethod
-    def listar_funcionarios(cls) -> str:
+    def listar_usuarios(cls) -> str:
         return "\n".join([funcionario.infos() for funcionario in cls.lista_registros]) 
