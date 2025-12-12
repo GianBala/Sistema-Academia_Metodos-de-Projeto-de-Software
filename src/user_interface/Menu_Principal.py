@@ -1,12 +1,10 @@
 import os
-from use_cases.Gerenciar_Aluno import Gerenciar_Aluno
-from Menu_Cadastro import Menu_Cadastro
+from src.use_cases.Gerenciar_Aluno import Gerenciar_Aluno
+from src.user_interface.Menu_Cadastro import Menu_Cadastro
 
 class Menu_Principal:
 
-    def __init__(self):
-        pass
-
+    @staticmethod
     def run():
         print("=== Menu Principal ===")
         print("1. Cadastrar Usuario")
@@ -20,7 +18,7 @@ class Menu_Principal:
         if escolha == "1":
             Menu_Cadastro.menu_cadastrar_usuario()
         elif escolha == "2":
-            Gerenciar_Aluno.listar_alunos()
+            print(Gerenciar_Aluno.listar_alunos())
             input("\nPressione Enter para continuar...")
 
         elif escolha == "3":
@@ -29,7 +27,8 @@ class Menu_Principal:
         else:
             
             print("Opção inválida. Tente novamente.\n")
-            Menu_Principal.run()
+        
+        Menu_Principal.run()
     
 
 

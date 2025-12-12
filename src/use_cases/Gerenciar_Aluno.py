@@ -1,17 +1,17 @@
 from src.use_cases.Aluno import Aluno
+from typing import List
 
-class Gerenciar_Aluno():
-    lista_alunos = []
-    
-    def __init__(self):
-        pass
+class Gerenciar_Aluno:
+    lista_alunos :  List[Aluno] = []  
 
-    def listar_alunos(self) -> str:
-        return "\n".join([f"Nome: {aluno.nome}, Data de Nascimento: {aluno.dt_nascimento}, Email: {aluno.email}" for aluno in Gerenciar_Aluno.lista_alunos])    
+    @staticmethod
+    def listar_alunos() -> str:
+        return "\n".join([f"Nome: {aluno._nome}, Data de Nascimento: {aluno.dt_nascimento}, Email: {aluno.email}" for aluno in Gerenciar_Aluno.lista_alunos])    
     
-    def cadastrar_aluno(self, nome: str, dt_nascimento: str, email: str):
+    @staticmethod
+    def cadastrar_aluno(nome: str, dt_nascimento: str, email: str):
         novo_aluno = Aluno(nome, dt_nascimento, email)
-        Gerenciar_Aluno.listar_alunos.append(novo_aluno)
+        Gerenciar_Aluno.lista_alunos.append(novo_aluno)
         return
     
  

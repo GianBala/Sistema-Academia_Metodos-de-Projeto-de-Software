@@ -1,7 +1,9 @@
-from user_interface.Menu_Principal import Menu_Principal
-class Main:
-    def __init__(self):
-        pass
+from src.user_interface.Menu_Principal import Menu_Principal
 
+class Main:
+
+    @staticmethod
     def run():
-        Menu_Principal.menu_principal()
+        Menu_Principal.run()
+
+Main.run()

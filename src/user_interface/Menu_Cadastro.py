@@ -1,19 +1,16 @@
 from src.use_cases.Gerenciar_Aluno import Gerenciar_Aluno
-from Menu_Principal import Menu_Principal
 import os
 
 class Menu_Cadastro:
-
-    def __init__(self):
-        pass
-
+    
+    @staticmethod
     def menu_cadastrar_usuario():
         print("=== Cadastrar Usuario ===")
         nome = input("Nome: ")
         dt_nascimento = input("Data de Nascimento: ")
         email = input("Email: ")
         
-        Gerenciar_Aluno().cadastrar_aluno(nome, dt_nascimento, email)
+        Gerenciar_Aluno.cadastrar_aluno(nome, dt_nascimento, email)
         
         print("Aluno cadastrado com sucesso!")
         
@@ -21,6 +18,7 @@ class Menu_Cadastro:
 
         os.system("cls")
 
+        from src.user_interface.Menu_Principal import Menu_Principal
         Menu_Principal.run()
 
         return

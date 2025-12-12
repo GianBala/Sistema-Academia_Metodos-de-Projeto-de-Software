@@ -1,6 +1,6 @@
 from typing import List, Optional
 
-class Aluno():
+class Aluno:
     lista_registros = []
 
     def __init__(self, nome: str, dt_nascimento: str, email: str, matricula: Optional[int] = None):
