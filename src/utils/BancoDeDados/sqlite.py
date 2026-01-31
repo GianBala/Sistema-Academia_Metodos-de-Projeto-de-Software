@@ -28,19 +28,25 @@ class BancoDeDados:
         else:
             print("Banco incializad com Sucesso!")
 
-    def CadastroAdministrador(self, data, query):
-        pass
+    def CadastroAdministrador(self, data):
+        query = f"INSERT INTO administradores VALUES ('{data[0]}', '{data[1]}', '{data[2]}', '{data[3]}', '{data[4]}')"
+        self.cur.execute(query)
+        self.con.commit()
 
     def CadastroAluno(self, data):
         query = f"INSERT INTO alunos VALUES ('{data[0]}', '{data[1]}', '{data[2]}', '{data[3]}')"
         self.cur.execute(query)
         self.con.commit()
 
-    def CadastroAtendente(self, data, query):
-        pass
+    def CadastroAtendente(self, data):
+        query = f"INSERT INTO atendentes VALUES ('{data[0]}', '{data[1]}', '{data[2]}')"
+        self.cur.execute(query)
+        self.con.commit()
 
-    def CadastroProfessor(self, data, query):
-        pass
+    def CadastroProfessor(self, data):
+        query = f"INSERT INTO professores VALUES ('{data[0]}', '{data[1]}', '{data[2]}')"
+        self.cur.execute(query)
+        self.con.commit()
 
     def Retorna_Todos(self, tabela):
         query = (f"SELECT * FROM {tabela};")

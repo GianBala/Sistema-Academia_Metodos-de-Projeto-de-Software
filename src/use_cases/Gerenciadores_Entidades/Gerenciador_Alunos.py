@@ -8,7 +8,7 @@ class GerenciadorAlunos(Gerenciador):
     usuarios: List[Aluno] = []
 
     @staticmethod
-    def cadastrar_usuario(nome, dt_nascimento, email) -> Aluno:
+    def cadastrar_usuario(nome, dt_nascimento, email):
         matricula = randint(1, 9999)
         novo_usuario = Aluno(nome, dt_nascimento, email, matricula)
         
@@ -24,5 +24,6 @@ class GerenciadorAlunos(Gerenciador):
         #Acessar banco para listar alunos
         db = sql.BancoDeDados()
         dados = db.Retorna_Todos("alunos")
+        print("=" * 30, "Lista de Alunos", "=" * 30)
         for d in dados:
             print(f"Nome:{d[0]:30} Email:{d[2]:30} Matricula:{d[3]}")

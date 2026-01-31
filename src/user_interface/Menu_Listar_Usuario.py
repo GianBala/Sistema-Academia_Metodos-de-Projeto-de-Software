@@ -18,7 +18,11 @@ class MenuListarUsuario:
             if escolha == "1":
                 GerenciadorAlunos.listarAlunos()
             elif escolha == "2":
-                print(GerenciadorAdministradores.listar_usuarios() + "\n" + GerenciadorAlunos.listar_usuarios() + "\n" + GerenciadorProfessores.listar_usuarios() + "\n" + GerenciadorAtendentes.listar_usuarios() + "\n")
+                # Chama os métodos referentes em cada Gerenciador
+                GerenciadorAdministradores.listarAdministradores()
+                GerenciadorAlunos.listarAlunos()
+                GerenciadorAtendentes.listarAtendentes()
+                GerenciadorProfessores.listarProfessores()
             elif escolha == "3":
                 os.system("cls")
                 
