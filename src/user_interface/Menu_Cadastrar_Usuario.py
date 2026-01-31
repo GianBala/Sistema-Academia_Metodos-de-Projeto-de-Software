@@ -24,7 +24,7 @@ class MenuCadastrarUsuario:
                 novo_usuario = GerenciadorAdministradores.cadastrar_usuario(nome, dt_nascimento, email, login, senha)
 
             elif tipo == "2":
-                novo_usuario = GerenciadorAlunos.cadastrar_usuario(nome, dt_nascimento, email, matricula=1)
+                novo_usuario = GerenciadorAlunos.cadastrar_usuario(nome, dt_nascimento, email)
 
             elif tipo == "3":
                 tipo_funcionario = input("Tipo de Funcionario (1-Professor, 2-Atendente): ")

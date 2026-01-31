@@ -16,7 +16,7 @@ class MenuListarUsuario:
         escolha = input("Escolha uma opção: ").strip()
         try:
             if escolha == "1":
-                print(GerenciadorAlunos.listar_usuarios())
+                GerenciadorAlunos.listarAlunos()
             elif escolha == "2":
                 print(GerenciadorAdministradores.listar_usuarios() + "\n" + GerenciadorAlunos.listar_usuarios() + "\n" + GerenciadorProfessores.listar_usuarios() + "\n" + GerenciadorAtendentes.listar_usuarios() + "\n")
             elif escolha == "3":
