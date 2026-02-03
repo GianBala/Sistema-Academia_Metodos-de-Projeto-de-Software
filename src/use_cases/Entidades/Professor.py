@@ -4,8 +4,8 @@ from typing import List, Optional
 
 class Professor(Funcionario):
 
-    def __init__(self, nome: str, idade: int, email: str, alunos : Optional[List[Aluno]] = None):
-        super().__init__(nome, idade, email)
+    def __init__(self, nome: str, dt_nascimento: str, email: str, alunos : Optional[List[Aluno]] = None):
+        super().__init__(nome, dt_nascimento, email)
         
         if alunos is None:
             alunos = []
