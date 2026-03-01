@@ -1,0 +1,316 @@
+@startuml Academia System
+
+skinparam classAttributeIconSize 0
+
+' ==================== ENTITIES ====================
+package "domain.entity" {
+    abstract class Entidade {
+        - id: long
+        - nome: String
+        - dataNascimento: LocalDate
+        - email: String
+        + getId(): long
+        + setId(long): void
+        + getNome(): String
+        + getDataNascimento(): LocalDate
+        + getEmail(): String
+        + getIdade(): int
+        + infos(): String
+        # getCargo(): String
+    }
+
+    abstract class Funcionario {
+    }
+
+    class Aluno {
+        - matricula: int
+        + getMatricula(): int
+        + infos(): String
+    }
+
+    class Professor {
+        - alunos: List<Aluno>
+        + adicionarAluno(Aluno): void
+        + getAlunos(): List<Aluno>
+    }
+
+    class Atendente {
+    }
+
+    class Administrador {
+        - login: String
+        - senhaHash: String
+        + getLogin(): String
+        + getSenhaHash(): String
+        + infos(): String
+    }
+
+    Funcionario --|> Entidade
+    Aluno --|> Entidade
+    Administrador --|> Entidade
+    Professor --|> Funcionario
+    Atendente --|> Funcionario
+    Professor "1" *--> "*" Aluno : alunos
+}
+
+' ==================== REPOSITORY INTERFACES ====================
+package "domain.repository" {
+    interface "Repository<T>" {
+        + save(T): void
+        + findAll(): List<T>
+        + findById(long): Optional<T>
+    }
+
+    interface AlunoRepository {
+        + findByMatricula(int): Optional<Aluno>
+    }
+
+    interface ProfessorRepository {
+    }
+
+    interface AtendenteRepository {
+    }
+
+    interface AdministradorRepository {
+        + findByLogin(String): Optional<Administrador>
+    }
+
+    AlunoRepository --|> "Repository<T>"
+    ProfessorRepository --|> "Repository<T>"
+    AtendenteRepository --|> "Repository<T>"
+    AdministradorRepository --|> "Repository<T>"
+}
+
+' ==================== VALIDATION ====================
+package "domain.validation" {
+    interface "Validator<T>" {
+        + validate(T): ValidationResult
+    }
+
+    class ValidationResult {
+        - errors: List<String>
+        + {static} ok(): ValidationResult
+        + {static} error(String): ValidationResult
+        + {static} merge(List): ValidationResult
+        + isValid(): boolean
+        + getErrors(): List<String>
+        + getErrorMessage(): String
+    }
+
+    class DataNascimentoValidator {
+        + validate(String): ValidationResult
+        + parse(String): LocalDate
+    }
+
+    class EmailValidator {
+        + validate(String): ValidationResult
+    }
+
+    class LoginValidator {
+        + validate(String): ValidationResult
+    }
+
+    class SenhaValidator {
+        - nome: String
+        - email: String
+        + validate(String): ValidationResult
+    }
+
+    class IdadeMinimaPredicate {
+        - idadeMinima: int
+        + validate(LocalDate): ValidationResult
+    }
+
+    DataNascimentoValidator ..|> "Validator<T>"
+    EmailValidator ..|> "Validator<T>"
+    LoginValidator ..|> "Validator<T>"
+    SenhaValidator ..|> "Validator<T>"
+    IdadeMinimaPredicate ..|> "Validator<T>"
+}
+
+' ==================== APPLICATION (FACADE + SINGLETON) ====================
+package "application" {
+    class FacadeSingletonController {
+        - {static} instance: FacadeSingletonController
+        + {static} getInstance(AlunoService, ProfessorService, AtendenteService, AdministradorService): FacadeSingletonController
+        + cadastrarAluno(String, String, String): Aluno
+        + listarAlunos(): List<Aluno>
+        + cadastrarProfessor(String, String, String): Professor
+        + listarProfessores(): List<Professor>
+        + cadastrarAtendente(String, String, String): Atendente
+        + listarAtendentes(): List<Atendente>
+        + cadastrarAdministrador(String, String, String, String, String): Administrador
+        + listarAdministradores(): List<Administrador>
+        + contarTotalEntidades(): int
+    }
+
+    FacadeSingletonController --> AlunoService
+    FacadeSingletonController --> ProfessorService
+    FacadeSingletonController --> AtendenteService
+    FacadeSingletonController --> AdministradorService
+}
+
+' ==================== SERVICES ====================
+package "domain.service" {
+    interface MatriculaGenerator {
+        + generate(): int
+    }
+
+    class RandomMatriculaGenerator {
+        - random: Random
+        + generate(): int
+    }
+
+    class AlunoService {
+        + cadastrar(String, String, String): Aluno
+        + listarTodos(): List<Aluno>
+    }
+
+    class ProfessorService {
+        - IDADE_MINIMA_FUNCIONARIO: int
+        + cadastrar(String, String, String): Professor
+        + listarTodos(): List<Professor>
+    }
+
+    class AtendenteService {
+        - IDADE_MINIMA_FUNCIONARIO: int
+        + cadastrar(String, String, String): Atendente
+        + listarTodos(): List<Atendente>
+    }
+
+    class AdministradorService {
+        + cadastrar(String, String, String, String, String): Administrador
+        + listarTodos(): List<Administrador>
+    }
+
+    RandomMatriculaGenerator ..|> MatriculaGenerator
+    RandomMatriculaGenerator --> AlunoRepository
+
+    AlunoService --> AlunoRepository
+    AlunoService --> MatriculaGenerator
+    AlunoService --> DataNascimentoValidator
+    AlunoService --> EmailValidator
+    AlunoService ..> ValidationResult
+
+    ProfessorService --> ProfessorRepository
+    ProfessorService --> DataNascimentoValidator
+    ProfessorService --> EmailValidator
+    ProfessorService --> IdadeMinimaPredicate
+    ProfessorService ..> ValidationResult
+
+    AtendenteService --> AtendenteRepository
+    AtendenteService --> DataNascimentoValidator
+    AtendenteService --> EmailValidator
+    AtendenteService --> IdadeMinimaPredicate
+    AtendenteService ..> ValidationResult
+
+    AdministradorService --> AdministradorRepository
+    AdministradorService --> PasswordHasher
+    AdministradorService --> DataNascimentoValidator
+    AdministradorService --> EmailValidator
+    AdministradorService --> LoginValidator
+    AdministradorService --> SenhaValidator
+    AdministradorService ..> ValidationResult
+}
+
+' ==================== SECURITY ====================
+package "infrastructure.security" {
+    interface PasswordHasher {
+        + hash(String): String
+        + verify(String, String): boolean
+    }
+
+    class BCryptPasswordHasher {
+        + hash(String): String
+        + verify(String, String): boolean
+    }
+
+    BCryptPasswordHasher ..|> PasswordHasher
+}
+
+' ==================== DATABASE ====================
+package "infrastructure.database" {
+    class DatabaseConnection {
+        - DB_URL: String
+        + getConnection(): Connection
+        + close(): void
+    }
+
+    class SqliteAlunoRepository {
+        + save(Aluno): void
+        + findAll(): List<Aluno>
+        + findById(long): Optional<Aluno>
+        + findByMatricula(int): Optional<Aluno>
+    }
+
+    class SqliteProfessorRepository {
+        + save(Professor): void
+        + findAll(): List<Professor>
+        + findById(long): Optional<Professor>
+    }
+
+    class SqliteAtendenteRepository {
+        + save(Atendente): void
+        + findAll(): List<Atendente>
+        + findById(long): Optional<Atendente>
+    }
+
+    class SqliteAdministradorRepository {
+        + save(Administrador): void
+        + findAll(): List<Administrador>
+        + findById(long): Optional<Administrador>
+        + findByLogin(String): Optional<Administrador>
+    }
+
+    SqliteAlunoRepository ..|> AlunoRepository
+    SqliteProfessorRepository ..|> ProfessorRepository
+    SqliteAtendenteRepository ..|> AtendenteRepository
+    SqliteAdministradorRepository ..|> AdministradorRepository
+}
+
+' ==================== UI ====================
+package "ui.console" {
+    class ConsoleUtils {
+        - scanner: Scanner
+        + clearConsole(): void
+        + readInput(String): String
+        + waitForEnter(): void
+        + printHeader(String): void
+        + printSeparator(String): void
+    }
+
+    class MenuCadastrarUsuario {
+        + executar(): void
+    }
+
+    class MenuListarUsuario {
+        + executar(): void
+    }
+
+    class MenuPrincipal {
+        + executar(): void
+    }
+
+    MenuCadastrarUsuario --> FacadeSingletonController
+    MenuCadastrarUsuario --> ConsoleUtils
+
+    MenuListarUsuario --> FacadeSingletonController
+    MenuListarUsuario --> ConsoleUtils
+
+    MenuPrincipal --> MenuCadastrarUsuario
+    MenuPrincipal --> MenuListarUsuario
+    MenuPrincipal --> ConsoleUtils
+}
+
+' ==================== APP ====================
+package "br.edu.academia" {
+    class App {
+        + {static} main(String[]): void
+    }
+
+    App --> DatabaseConnection
+    App --> FacadeSingletonController
+    App --> MenuPrincipal
+}
+
+@enduml

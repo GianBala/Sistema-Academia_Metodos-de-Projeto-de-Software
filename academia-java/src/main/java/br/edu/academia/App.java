@@ -1,5 +1,6 @@
 package br.edu.academia;
 
+import br.edu.academia.application.FacadeSingletonController;
 import br.edu.academia.domain.service.*;
 import br.edu.academia.infrastructure.database.*;
 import br.edu.academia.infrastructure.security.BCryptPasswordHasher;
@@ -27,13 +28,14 @@ public class App {
         var atendenteService = new AtendenteService(atendenteRepo);
         var adminService = new AdministradorService(adminRepo, passwordHasher);
 
+        var facade = FacadeSingletonController.getInstance(
+                alunoService, professorService, atendenteService, adminService);
+
         var scanner = new Scanner(System.in);
         var console = new ConsoleUtils(scanner);
 
-        var menuCadastrar = new MenuCadastrarUsuario(
-                alunoService, professorService, atendenteService, adminService, console);
-        var menuListar = new MenuListarUsuario(
-                alunoService, professorService, atendenteService, adminService, console);
+        var menuCadastrar = new MenuCadastrarUsuario(facade, console);
+        var menuListar = new MenuListarUsuario(facade, console);
         var menuPrincipal = new MenuPrincipal(menuCadastrar, menuListar, console);
 
         menuPrincipal.executar();

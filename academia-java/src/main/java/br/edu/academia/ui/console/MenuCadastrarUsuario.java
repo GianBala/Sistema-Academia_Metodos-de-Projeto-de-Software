@@ -1,27 +1,14 @@
 package br.edu.academia.ui.console;
 
-import br.edu.academia.domain.service.AdministradorService;
-import br.edu.academia.domain.service.AlunoService;
-import br.edu.academia.domain.service.AtendenteService;
-import br.edu.academia.domain.service.ProfessorService;
+import br.edu.academia.application.FacadeSingletonController;
 
 public class MenuCadastrarUsuario {
 
-    private final AlunoService alunoService;
-    private final ProfessorService professorService;
-    private final AtendenteService atendenteService;
-    private final AdministradorService administradorService;
+    private final FacadeSingletonController facade;
     private final ConsoleUtils console;
 
-    public MenuCadastrarUsuario(AlunoService alunoService,
-                                ProfessorService professorService,
-                                AtendenteService atendenteService,
-                                AdministradorService administradorService,
-                                ConsoleUtils console) {
-        this.alunoService = alunoService;
-        this.professorService = professorService;
-        this.atendenteService = atendenteService;
-        this.administradorService = administradorService;
+    public MenuCadastrarUsuario(FacadeSingletonController facade, ConsoleUtils console) {
+        this.facade = facade;
         this.console = console;
     }
 
@@ -55,12 +42,12 @@ public class MenuCadastrarUsuario {
     private void cadastrarAdministrador(String nome, String dataNascimento, String email) {
         String login = console.readInput("Login: ");
         String senha = console.readInput("Senha: ");
-        var admin = administradorService.cadastrar(nome, dataNascimento, email, login, senha);
+        var admin = facade.cadastrarAdministrador(nome, dataNascimento, email, login, senha);
         System.out.println("Administrador " + admin.getNome() + " cadastrado com sucesso!");
     }
 
     private void cadastrarAluno(String nome, String dataNascimento, String email) {
-        var aluno = alunoService.cadastrar(nome, dataNascimento, email);
+        var aluno = facade.cadastrarAluno(nome, dataNascimento, email);
         System.out.println("Aluno " + aluno.getNome() + " cadastrado com sucesso! Matricula: " + aluno.getMatricula());
     }
 
@@ -71,11 +58,11 @@ public class MenuCadastrarUsuario {
 
         switch (subTipo) {
             case "1" -> {
-                var professor = professorService.cadastrar(nome, dataNascimento, email);
+                var professor = facade.cadastrarProfessor(nome, dataNascimento, email);
                 System.out.println("Professor " + professor.getNome() + " cadastrado com sucesso!");
             }
             case "2" -> {
-                var atendente = atendenteService.cadastrar(nome, dataNascimento, email);
+                var atendente = facade.cadastrarAtendente(nome, dataNascimento, email);
                 System.out.println("Atendente " + atendente.getNome() + " cadastrado com sucesso!");
             }
             default -> System.out.println("Tipo de funcionario invalido.");

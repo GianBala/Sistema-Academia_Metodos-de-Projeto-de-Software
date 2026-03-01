@@ -1,30 +1,17 @@
 package br.edu.academia.ui.console;
 
+import br.edu.academia.application.FacadeSingletonController;
 import br.edu.academia.domain.entity.Entidade;
-import br.edu.academia.domain.service.AdministradorService;
-import br.edu.academia.domain.service.AlunoService;
-import br.edu.academia.domain.service.AtendenteService;
-import br.edu.academia.domain.service.ProfessorService;
 
 import java.util.List;
 
 public class MenuListarUsuario {
 
-    private final AlunoService alunoService;
-    private final ProfessorService professorService;
-    private final AtendenteService atendenteService;
-    private final AdministradorService administradorService;
+    private final FacadeSingletonController facade;
     private final ConsoleUtils console;
 
-    public MenuListarUsuario(AlunoService alunoService,
-                             ProfessorService professorService,
-                             AtendenteService atendenteService,
-                             AdministradorService administradorService,
-                             ConsoleUtils console) {
-        this.alunoService = alunoService;
-        this.professorService = professorService;
-        this.atendenteService = atendenteService;
-        this.administradorService = administradorService;
+    public MenuListarUsuario(FacadeSingletonController facade, ConsoleUtils console) {
+        this.facade = facade;
         this.console = console;
     }
 
@@ -39,7 +26,7 @@ public class MenuListarUsuario {
         String escolha = console.readInput("Escolha uma opcao: ");
 
         switch (escolha) {
-            case "1" -> printEntidades("Alunos", alunoService.listarTodos());
+            case "1" -> printEntidades("Alunos", facade.listarAlunos());
             case "2" -> listarTodos();
             case "3" -> { return; }
             default -> System.out.println("Opcao invalida.");
@@ -48,10 +35,11 @@ public class MenuListarUsuario {
     }
 
     private void listarTodos() {
-        printEntidades("Administradores", administradorService.listarTodos());
-        printEntidades("Alunos", alunoService.listarTodos());
-        printEntidades("Atendentes", atendenteService.listarTodos());
-        printEntidades("Professores", professorService.listarTodos());
+        printEntidades("Administradores", facade.listarAdministradores());
+        printEntidades("Alunos", facade.listarAlunos());
+        printEntidades("Atendentes", facade.listarAtendentes());
+        printEntidades("Professores", facade.listarProfessores());
+        System.out.println("Total de entidades cadastradas: " + facade.contarTotalEntidades());
     }
 
     private void printEntidades(String titulo, List<? extends Entidade> entidades) {
