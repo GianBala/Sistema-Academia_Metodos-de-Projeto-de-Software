@@ -28,3 +28,10 @@ CREATE TABLE IF NOT EXISTS administradores (
     login TEXT NOT NULL UNIQUE,
     senha_hash TEXT NOT NULL
 );
+
+CREATE TABLE IF NOT EXISTS registro_acesso (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    tipo_operacao TEXT NOT NULL,
+    tipo_entidade TEXT NOT NULL,
+    timestamp TEXT NOT NULL
+);
