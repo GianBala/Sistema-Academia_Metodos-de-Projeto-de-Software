@@ -4,13 +4,16 @@ public class MenuPrincipal {
 
     private final MenuCadastrarUsuario menuCadastrar;
     private final MenuListarUsuario menuListar;
+    private final MenuRelatorio menuRelatorio;
     private final ConsoleUtils console;
 
     public MenuPrincipal(MenuCadastrarUsuario menuCadastrar,
                          MenuListarUsuario menuListar,
+                         MenuRelatorio menuRelatorio,
                          ConsoleUtils console) {
         this.menuCadastrar = menuCadastrar;
         this.menuListar = menuListar;
+        this.menuRelatorio = menuRelatorio;
         this.console = console;
     }
 
@@ -21,7 +24,8 @@ public class MenuPrincipal {
             console.printHeader("Sistema Academia");
             System.out.println("1. Cadastrar Usuario");
             System.out.println("2. Listar Usuarios");
-            System.out.println("3. Sair");
+            System.out.println("3. Gerar Relatorio");
+            System.out.println("4. Sair");
             System.out.println();
 
             String escolha = console.readInput("Escolha uma opcao: ");
@@ -29,7 +33,8 @@ public class MenuPrincipal {
             switch (escolha) {
                 case "1" -> menuCadastrar.executar();
                 case "2" -> menuListar.executar();
-                case "3" -> {
+                case "3" -> menuRelatorio.executar();
+                case "4" -> {
                     System.out.println("Saindo do sistema...");
                     running = false;
                 }
