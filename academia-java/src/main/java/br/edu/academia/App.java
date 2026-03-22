@@ -42,7 +42,7 @@ public class App {
         var geradorTxt = new GeradorRelatorioTxt(acessoService);
 
         var facade = FacadeSingletonController.getInstance(
-                alunoService, professorService, atendenteService, adminService,
+                alunoService, alunoRepo, professorService, atendenteService, adminService,
                 acessoService, logger, geradorHtml, geradorTxt);
 
         var scanner = new Scanner(System.in);
@@ -51,7 +51,8 @@ public class App {
         var menuCadastrar = new MenuCadastrarUsuario(facade, console);
         var menuListar = new MenuListarUsuario(facade, console);
         var menuRelatorio = new MenuRelatorio(facade, console);
-        var menuPrincipal = new MenuPrincipal(menuCadastrar, menuListar, menuRelatorio, console);
+        var menuAtualizar = new MenuAtualizarAluno(facade, console);
+        var menuPrincipal = new MenuPrincipal(menuCadastrar, menuListar, menuRelatorio, menuAtualizar, console);
 
         menuPrincipal.executar();
 

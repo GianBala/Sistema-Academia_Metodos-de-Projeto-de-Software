@@ -1,11 +1,16 @@
 package br.edu.academia.application;
 
+import br.edu.academia.domain.command.AtualizarAlunoCommand;
+import br.edu.academia.domain.command.CadastrarAlunoCommand;
+import br.edu.academia.domain.command.CommandHistory;
+import br.edu.academia.domain.command.ListarAlunosCommand;
 import br.edu.academia.domain.entity.Administrador;
 import br.edu.academia.domain.entity.Aluno;
 import br.edu.academia.domain.entity.Atendente;
 import br.edu.academia.domain.entity.Professor;
 import br.edu.academia.domain.report.GeradorRelatorioHtml;
 import br.edu.academia.domain.report.GeradorRelatorioTxt;
+import br.edu.academia.domain.repository.AlunoRepository;
 import br.edu.academia.domain.service.AcessoService;
 import br.edu.academia.domain.service.AdministradorService;
 import br.edu.academia.domain.service.AlunoService;
@@ -20,6 +25,7 @@ public class FacadeSingletonController {
     private static volatile FacadeSingletonController instance;
 
     private final AlunoService alunoService;
+    private final AlunoRepository alunoRepository;
     private final ProfessorService professorService;
     private final AtendenteService atendenteService;
     private final AdministradorService administradorService;
@@ -27,9 +33,11 @@ public class FacadeSingletonController {
     private final Logger logger;
     private final GeradorRelatorioHtml geradorHtml;
     private final GeradorRelatorioTxt geradorTxt;
+    private final CommandHistory commandHistory;
 
     private FacadeSingletonController(
             AlunoService alunoService,
+            AlunoRepository alunoRepository,
             ProfessorService professorService,
             AtendenteService atendenteService,
             AdministradorService administradorService,
@@ -38,6 +46,7 @@ public class FacadeSingletonController {
             GeradorRelatorioHtml geradorHtml,
             GeradorRelatorioTxt geradorTxt) {
         this.alunoService = alunoService;
+        this.alunoRepository = alunoRepository;
         this.professorService = professorService;
         this.atendenteService = atendenteService;
         this.administradorService = administradorService;
@@ -45,10 +54,12 @@ public class FacadeSingletonController {
         this.logger = logger;
         this.geradorHtml = geradorHtml;
         this.geradorTxt = geradorTxt;
+        this.commandHistory = new CommandHistory();
     }
 
     public static FacadeSingletonController getInstance(
             AlunoService alunoService,
+            AlunoRepository alunoRepository,
             ProfessorService professorService,
             AtendenteService atendenteService,
             AdministradorService administradorService,
@@ -60,8 +71,8 @@ public class FacadeSingletonController {
             synchronized (FacadeSingletonController.class) {
                 if (instance == null) {
                     instance = new FacadeSingletonController(
-                            alunoService, professorService, atendenteService, administradorService,
-                            acessoService, logger, geradorHtml, geradorTxt);
+                            alunoService, alunoRepository, professorService, atendenteService,
+                            administradorService, acessoService, logger, geradorHtml, geradorTxt);
                 }
             }
         }
@@ -73,16 +84,31 @@ public class FacadeSingletonController {
     }
 
     public Aluno cadastrarAluno(String nome, String dataNascimento, String email) {
-        Aluno aluno = alunoService.cadastrar(nome, dataNascimento, email);
-        logger.info("Aluno cadastrado: " + nome);
-        acessoService.registrarOperacao("CADASTRO", "ALUNO");
-        return aluno;
+        CadastrarAlunoCommand cmd = new CadastrarAlunoCommand(
+                alunoService, logger, acessoService, nome, dataNascimento, email);
+        commandHistory.executeCommand(cmd);
+        return cmd.getResultado();
     }
 
     public List<Aluno> listarAlunos() {
-        logger.info("Listando alunos");
-        acessoService.registrarOperacao("LISTAGEM", "ALUNO");
-        return alunoService.listarTodos();
+        ListarAlunosCommand cmd = new ListarAlunosCommand(alunoService, logger, acessoService);
+        commandHistory.executeCommand(cmd);
+        return cmd.getResultado();
+    }
+
+    public Aluno atualizarAluno(long id, String nome, String dataNascimento, String email) {
+        AtualizarAlunoCommand cmd = new AtualizarAlunoCommand(
+                alunoService, alunoRepository, logger, acessoService, id, nome, dataNascimento, email);
+        commandHistory.executeCommand(cmd);
+        return cmd.getResultado();
+    }
+
+    public void desfazerUltimaAtualizacaoAluno() {
+        commandHistory.undoUltimaAtualizacao();
+    }
+
+    public boolean temAtualizacaoParaDesfazer() {
+        return commandHistory.temAtualizacaoParaDesfazer();
     }
 
     public Professor cadastrarProfessor(String nome, String dataNascimento, String email) {
