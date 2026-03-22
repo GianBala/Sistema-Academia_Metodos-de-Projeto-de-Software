@@ -121,5 +121,10 @@ class GeradorRelatorioTest {
                             && r.getTipoEntidade().equals(tipoEntidade))
                     .count();
         }
+
+        @Override
+        public void update(RegistroAcesso entity) {
+            throw new UnsupportedOperationException();
+        }
     }
 }

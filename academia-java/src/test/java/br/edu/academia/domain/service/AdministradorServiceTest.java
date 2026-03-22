@@ -88,5 +88,10 @@ class AdministradorServiceTest {
         public Optional<Administrador> findByLogin(String login) {
             return admins.stream().filter(a -> a.getLogin().equals(login)).findFirst();
         }
+
+        @Override
+        public void update(Administrador entity) {
+            throw new UnsupportedOperationException();
+        }
     }
 }

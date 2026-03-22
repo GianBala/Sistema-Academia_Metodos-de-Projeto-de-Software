@@ -67,6 +67,11 @@ public class SqliteProfessorRepository implements ProfessorRepository {
         return Optional.empty();
     }
 
+    @Override
+    public void update(Professor entity) {
+        throw new UnsupportedOperationException("Update nao implementado para Professor.");
+    }
+
     private Professor mapRow(ResultSet rs) throws SQLException {
         Professor professor = new Professor(
                 rs.getString("nome"),

@@ -85,6 +85,11 @@ public class SqliteAdministradorRepository implements AdministradorRepository {
         return Optional.empty();
     }
 
+    @Override
+    public void update(Administrador entity) {
+        throw new UnsupportedOperationException("Update nao implementado para Administrador.");
+    }
+
     private Administrador mapRow(ResultSet rs) throws SQLException {
         Administrador admin = new Administrador(
                 rs.getString("nome"),

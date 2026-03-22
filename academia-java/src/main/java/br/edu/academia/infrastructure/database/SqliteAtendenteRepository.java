@@ -67,6 +67,11 @@ public class SqliteAtendenteRepository implements AtendenteRepository {
         return Optional.empty();
     }
 
+    @Override
+    public void update(Atendente entity) {
+        throw new UnsupportedOperationException("Update nao implementado para Atendente.");
+    }
+
     private Atendente mapRow(ResultSet rs) throws SQLException {
         Atendente atendente = new Atendente(
                 rs.getString("nome"),

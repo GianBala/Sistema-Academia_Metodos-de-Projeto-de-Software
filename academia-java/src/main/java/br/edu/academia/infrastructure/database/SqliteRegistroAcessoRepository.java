@@ -118,6 +118,11 @@ public class SqliteRegistroAcessoRepository implements RegistroAcessoRepository 
         return 0;
     }
 
+    @Override
+    public void update(RegistroAcesso entity) {
+        throw new UnsupportedOperationException("Update nao implementado para RegistroAcesso.");
+    }
+
     private RegistroAcesso mapRow(ResultSet rs) throws SQLException {
         RegistroAcesso registro = new RegistroAcesso(
                 rs.getString("tipo_operacao"),

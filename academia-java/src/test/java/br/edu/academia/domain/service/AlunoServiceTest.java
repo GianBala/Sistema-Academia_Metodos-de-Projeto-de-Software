@@ -52,6 +52,23 @@ class AlunoServiceTest {
         assertEquals(2, service.listarTodos().size());
     }
 
+    @Test
+    void deveAtualizarAlunoComDadosValidos() {
+        Aluno aluno = service.cadastrar("Maria Silva", "15/03/2000", "maria@email.com");
+        long id = aluno.getId();
+
+        Aluno atualizado = service.atualizar(id, "Maria Santos", "20/04/1999", "santos@email.com");
+
+        assertEquals("Maria Santos", atualizado.getNome());
+        assertEquals("santos@email.com", atualizado.getEmail());
+    }
+
+    @Test
+    void deveLancarExcecaoAoAtualizarAlunoInexistente() {
+        assertThrows(IllegalArgumentException.class,
+                () -> service.atualizar(999L, "Nome", "01/01/2000", "x@email.com"));
+    }
+
     static class InMemoryAlunoRepository implements AlunoRepository {
         private final List<Aluno> alunos = new ArrayList<>();
         private long nextId = 1;
@@ -75,6 +92,16 @@ class AlunoServiceTest {
         @Override
         public Optional<Aluno> findByMatricula(int matricula) {
             return alunos.stream().filter(a -> a.getMatricula() == matricula).findFirst();
+        }
+
+        @Override
+        public void update(Aluno aluno) {
+            for (int i = 0; i < alunos.size(); i++) {
+                if (alunos.get(i).getId() == aluno.getId()) {
+                    alunos.set(i, aluno);
+                    return;
+                }
+            }
         }
     }
 }

@@ -28,12 +28,24 @@ public abstract class Entidade {
         return nome;
     }
 
+    public void setNome(String nome) {
+        this.nome = formatarNome(nome);
+    }
+
     public LocalDate getDataNascimento() {
         return dataNascimento;
     }
 
+    public void setDataNascimento(LocalDate dataNascimento) {
+        this.dataNascimento = dataNascimento;
+    }
+
     public String getEmail() {
         return email;
+    }
+
+    public void setEmail(String email) {
+        this.email = email;
     }
 
     public int getIdade() {
@@ -49,7 +61,7 @@ public abstract class Entidade {
         return getClass().getSimpleName();
     }
 
-    private String formatarNome(String nome) {
+    protected String formatarNome(String nome) {
         if (nome == null || nome.isBlank()) {
             return nome;
         }

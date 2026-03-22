@@ -71,5 +71,10 @@ class ProfessorServiceTest {
         public Optional<Professor> findById(long id) {
             return professores.stream().filter(p -> p.getId() == id).findFirst();
         }
+
+        @Override
+        public void update(Professor entity) {
+            throw new UnsupportedOperationException();
+        }
     }
 }

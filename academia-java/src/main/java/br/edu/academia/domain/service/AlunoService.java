@@ -44,4 +44,24 @@ public class AlunoService {
     public List<Aluno> listarTodos() {
         return repository.findAll();
     }
+
+    public Aluno atualizar(long id, String nome, String dataNascimentoStr, String email) {
+        Aluno aluno = repository.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException("Aluno nao encontrado com id: " + id));
+
+        ValidationResult result = ValidationResult.merge(List.of(
+                dataValidator.validate(dataNascimentoStr),
+                emailValidator.validate(email)
+        ));
+
+        if (!result.isValid()) {
+            throw new IllegalArgumentException(result.getErrorMessage());
+        }
+
+        aluno.setNome(nome);
+        aluno.setDataNascimento(dataValidator.parse(dataNascimentoStr));
+        aluno.setEmail(email);
+        repository.update(aluno);
+        return aluno;
+    }
 }
