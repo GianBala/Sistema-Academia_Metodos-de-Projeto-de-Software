@@ -44,7 +44,13 @@ public class AdministradorService {
         LocalDate dataNascimento = dataValidator.parse(dataNascimentoStr);
         String senhaHash = passwordHasher.hash(senha);
 
-        Administrador admin = new Administrador(nome, dataNascimento, email, login, senhaHash);
+        Administrador admin = new Administrador.Builder()
+                    .nome(nome)
+                    .dataNascimento(dataNascimento)
+                    .email(email)
+                    .login(login)
+                    .senhaHash(senhaHash)
+                    .build();
         repository.save(admin);
         return admin;
     }

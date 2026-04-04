@@ -43,7 +43,11 @@ public class AtendenteService {
             throw new IllegalArgumentException(result.getErrorMessage());
         }
 
-        Atendente atendente = new Atendente(nome, dataNascimento, email);
+        Atendente atendente = new Atendente.Builder()
+                    .nome(nome)
+                    .dataNascimento(dataNascimento)
+                    .email(email)
+                    .build();
         repository.save(atendente);
         return atendente;
     }

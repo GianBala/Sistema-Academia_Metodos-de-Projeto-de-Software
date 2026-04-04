@@ -36,7 +36,12 @@ public class AlunoService {
         LocalDate dataNascimento = dataValidator.parse(dataNascimentoStr);
         int matricula = matriculaGenerator.generate();
 
-        Aluno aluno = new Aluno(nome, dataNascimento, email, matricula);
+        Aluno aluno = new Aluno.Builder()
+                    .nome(nome)
+                    .dataNascimento(dataNascimento)
+                    .email(email)
+                    .matricula(matricula)
+                    .build();
         repository.save(aluno);
         return aluno;
     }

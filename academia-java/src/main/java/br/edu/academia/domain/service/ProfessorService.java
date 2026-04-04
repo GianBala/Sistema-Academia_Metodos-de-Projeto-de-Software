@@ -43,7 +43,12 @@ public class ProfessorService {
             throw new IllegalArgumentException(result.getErrorMessage());
         }
 
-        Professor professor = new Professor(nome, dataNascimento, email);
+        
+        Professor professor = new Professor.Builder()
+                    .nome(nome)
+                    .dataNascimento(dataNascimento)
+                    .email(email)
+                    .build();
         repository.save(professor);
         return professor;
     }
