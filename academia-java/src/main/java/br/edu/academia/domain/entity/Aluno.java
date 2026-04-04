@@ -1,22 +1,34 @@
 package br.edu.academia.domain.entity;
 
-import java.time.LocalDate;
+
 
 public class Aluno extends Entidade {
 
     private final int matricula;
 
-    public Aluno(String nome, LocalDate dataNascimento, String email, int matricula) {
-        super(nome, dataNascimento, email);
-        this.matricula = matricula;
+    private Aluno(Builder builder) {
+        super(builder);
+        this.matricula = builder.matricula;
     }
 
-    public int getMatricula() {
-        return matricula;
-    }
+    public int getMatricula() { return matricula; }
 
     @Override
     public String infos() {
         return super.infos() + String.format(" | Matricula: %d", matricula);
+    }
+
+    public static class Builder extends BuilderBase<Builder> {
+        private int matricula;
+
+        public Builder matricula(int matricula) {
+            this.matricula = matricula;
+            return this;
+        }
+
+        @Override
+        public Aluno build() {
+            return new Aluno(this);
+        }
     }
 }

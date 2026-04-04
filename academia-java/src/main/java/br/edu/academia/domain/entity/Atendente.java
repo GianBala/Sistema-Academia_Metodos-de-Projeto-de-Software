@@ -1,10 +1,15 @@
 package br.edu.academia.domain.entity;
 
-import java.time.LocalDate;
-
 public class Atendente extends Funcionario {
 
-    public Atendente(String nome, LocalDate dataNascimento, String email) {
-        super(nome, dataNascimento, email);
+    private Atendente(Builder builder) {
+        super(builder);
+    }
+
+    public static class Builder extends BuilderBase<Builder> {
+        @Override
+        public Atendente build() {
+            return new Atendente(this);
+        }
     }
 }
