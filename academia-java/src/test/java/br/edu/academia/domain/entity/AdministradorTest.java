@@ -1,0 +1,39 @@
+package br.edu.academia.domain.entity;
+
+import org.junit.jupiter.api.Test;
+
+import java.time.LocalDate;
+
+import static org.junit.jupiter.api.Assertions.*;
+
+class AdministradorTest {
+
+    @Test
+    void deveCriarAdministradorComLoginESenhaHash() {
+        Administrador admin = new Administrador.Builder()
+                .nome("Admin")
+                .dataNascimento(LocalDate.of(1990, 1, 1))
+                .email("admin@email.com")
+                .login("adminlogin")
+                .senhaHash("hash123")
+                .build();
+
+        assertEquals("Admin", admin.getNome());
+        assertEquals("adminlogin", admin.getLogin());
+        assertEquals("hash123", admin.getSenhaHash());
+    }
+
+    @Test
+    void infosDeveConterLogin() {
+        Administrador admin = new Administrador.Builder()
+                .nome("Admin")
+                .dataNascimento(LocalDate.of(1990, 1, 1))
+                .email("admin@email.com")
+                .login("meulogin")
+                .senhaHash("hash")
+                .build();
+
+        assertTrue(admin.infos().contains("meulogin"));
+        assertTrue(admin.infos().contains("Administrador"));
+    }
+}
