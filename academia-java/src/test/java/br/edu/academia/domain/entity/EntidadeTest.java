@@ -10,23 +10,36 @@ class EntidadeTest {
 
     @Test
     void deveCalcularIdadeCorretamente() {
-        LocalDate nascimento = LocalDate.now().minusYears(25);
-        Aluno aluno = new Aluno("teste", nascimento, "teste@email.com", 1);
+        Aluno aluno = new Aluno.Builder()
+                .nome("teste")
+                .dataNascimento(LocalDate.now().minusYears(25))
+                .email("teste@email.com")
+                .matricula(1)
+                .build();
 
         assertEquals(25, aluno.getIdade());
     }
 
     @Test
     void deveFormatarNomeComTitleCase() {
-        Aluno aluno = new Aluno("joao silva", LocalDate.of(2000, 1, 1), "joao@email.com", 1);
+        Aluno aluno = new Aluno.Builder()
+                .nome("joao silva")
+                .dataNascimento(LocalDate.of(2000, 1, 1))
+                .email("joao@email.com")
+                .matricula(1)
+                .build();
 
         assertEquals("Joao Silva", aluno.getNome());
     }
 
     @Test
     void deveRetornarInfosFormatadas() {
-        LocalDate nascimento = LocalDate.of(2000, 1, 1);
-        Aluno aluno = new Aluno("Maria", nascimento, "maria@email.com", 123);
+        Aluno aluno = new Aluno.Builder()
+                .nome("Maria")
+                .dataNascimento(LocalDate.of(2000, 1, 1))
+                .email("maria@email.com")
+                .matricula(123)
+                .build();
 
         String infos = aluno.infos();
 
@@ -38,7 +51,12 @@ class EntidadeTest {
 
     @Test
     void deveDefinirIdCorretamente() {
-        Aluno aluno = new Aluno("teste", LocalDate.of(2000, 1, 1), "t@e.com", 1);
+        Aluno aluno = new Aluno.Builder()
+                .nome("teste")
+                .dataNascimento(LocalDate.of(2000, 1, 1))
+                .email("t@e.com")
+                .matricula(1)
+                .build();
         aluno.setId(42);
 
         assertEquals(42, aluno.getId());

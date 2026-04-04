@@ -29,7 +29,12 @@ class SqliteAlunoRepositoryTest {
 
     @Test
     void deveSalvarERecuperarAluno() {
-        Aluno aluno = new Aluno("Maria", LocalDate.of(2000, 3, 15), "maria@email.com", 1234);
+        Aluno aluno = new Aluno.Builder()
+                .nome("Maria")
+                .dataNascimento(LocalDate.of(2000, 3, 15))
+                .email("maria@email.com")
+                .matricula(1234)
+                .build();
 
         repository.save(aluno);
 
@@ -42,7 +47,12 @@ class SqliteAlunoRepositoryTest {
 
     @Test
     void deveBuscarPorId() {
-        Aluno aluno = new Aluno("Carlos", LocalDate.of(1999, 1, 1), "carlos@email.com", 5678);
+        Aluno aluno = new Aluno.Builder()
+                .nome("Carlos")
+                .dataNascimento(LocalDate.of(1999, 1, 1))
+                .email("carlos@email.com")
+                .matricula(5678)
+                .build();
         repository.save(aluno);
 
         Optional<Aluno> encontrado = repository.findById(aluno.getId());
@@ -53,7 +63,12 @@ class SqliteAlunoRepositoryTest {
 
     @Test
     void deveBuscarPorMatricula() {
-        Aluno aluno = new Aluno("Ana", LocalDate.of(2001, 6, 10), "ana@email.com", 9999);
+        Aluno aluno = new Aluno.Builder()
+                .nome("Ana")
+                .dataNascimento(LocalDate.of(2001, 6, 10))
+                .email("ana@email.com")
+                .matricula(9999)
+                .build();
         repository.save(aluno);
 
         Optional<Aluno> encontrado = repository.findByMatricula(9999);
@@ -71,9 +86,9 @@ class SqliteAlunoRepositoryTest {
 
     @Test
     void deveListarMultiplosAlunos() {
-        repository.save(new Aluno("A", LocalDate.of(2000, 1, 1), "a@e.com", 1));
-        repository.save(new Aluno("B", LocalDate.of(2000, 1, 1), "b@e.com", 2));
-        repository.save(new Aluno("C", LocalDate.of(2000, 1, 1), "c@e.com", 3));
+        repository.save(new Aluno.Builder().nome("A").dataNascimento(LocalDate.of(2000, 1, 1)).email("a@e.com").matricula(1).build());
+        repository.save(new Aluno.Builder().nome("B").dataNascimento(LocalDate.of(2000, 1, 1)).email("b@e.com").matricula(2).build());
+        repository.save(new Aluno.Builder().nome("C").dataNascimento(LocalDate.of(2000, 1, 1)).email("c@e.com").matricula(3).build());
 
         assertEquals(3, repository.findAll().size());
     }

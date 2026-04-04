@@ -10,7 +10,12 @@ class AlunoTest {
 
     @Test
     void deveCriarAlunoComMatricula() {
-        Aluno aluno = new Aluno("Carlos", LocalDate.of(2000, 5, 15), "carlos@email.com", 1234);
+        Aluno aluno = new Aluno.Builder()
+                .nome("Carlos")
+                .dataNascimento(LocalDate.of(2000, 5, 15))
+                .email("carlos@email.com")
+                .matricula(1234)
+                .build();
 
         assertEquals("Carlos", aluno.getNome());
         assertEquals(1234, aluno.getMatricula());
@@ -19,7 +24,12 @@ class AlunoTest {
 
     @Test
     void infosDeveConterMatricula() {
-        Aluno aluno = new Aluno("Ana", LocalDate.of(1999, 3, 20), "ana@email.com", 5678);
+        Aluno aluno = new Aluno.Builder()
+                .nome("Ana")
+                .dataNascimento(LocalDate.of(1999, 3, 20))
+                .email("ana@email.com")
+                .matricula(5678)
+                .build();
 
         assertTrue(aluno.infos().contains("5678"));
         assertTrue(aluno.infos().contains("Matricula"));

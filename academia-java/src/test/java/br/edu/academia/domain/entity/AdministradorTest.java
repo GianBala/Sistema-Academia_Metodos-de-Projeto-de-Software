@@ -10,8 +10,13 @@ class AdministradorTest {
 
     @Test
     void deveCriarAdministradorComLoginESenhaHash() {
-        Administrador admin = new Administrador(
-                "Admin", LocalDate.of(1990, 1, 1), "admin@email.com", "adminlogin", "hash123");
+        Administrador admin = new Administrador.Builder()
+                .nome("Admin")
+                .dataNascimento(LocalDate.of(1990, 1, 1))
+                .email("admin@email.com")
+                .login("adminlogin")
+                .senhaHash("hash123")
+                .build();
 
         assertEquals("Admin", admin.getNome());
         assertEquals("adminlogin", admin.getLogin());
@@ -20,8 +25,13 @@ class AdministradorTest {
 
     @Test
     void infosDeveConterLogin() {
-        Administrador admin = new Administrador(
-                "Admin", LocalDate.of(1990, 1, 1), "admin@email.com", "meulogin", "hash");
+        Administrador admin = new Administrador.Builder()
+                .nome("Admin")
+                .dataNascimento(LocalDate.of(1990, 1, 1))
+                .email("admin@email.com")
+                .login("meulogin")
+                .senhaHash("hash")
+                .build();
 
         assertTrue(admin.infos().contains("meulogin"));
         assertTrue(admin.infos().contains("Administrador"));
