@@ -86,13 +86,13 @@ public class SqliteAdministradorRepository implements AdministradorRepository {
     }
 
     private Administrador mapRow(ResultSet rs) throws SQLException {
-        Administrador admin = new Administrador(
-                rs.getString("nome"),
-                LocalDate.parse(rs.getString("dt_nascimento")),
-                rs.getString("email"),
-                rs.getString("login"),
-                rs.getString("senha_hash")
-        );
+        Administrador admin = new Administrador.Builder()
+            .nome(rs.getString("nome"))
+            .dataNascimento(LocalDate.parse(rs.getString("dt_nascimento")))
+            .email(rs.getString("email"))
+            .login(rs.getString("login"))
+            .senhaHash(rs.getString("senha_hash"))
+            .build();
         admin.setId(rs.getLong("id"));
         return admin;
     }

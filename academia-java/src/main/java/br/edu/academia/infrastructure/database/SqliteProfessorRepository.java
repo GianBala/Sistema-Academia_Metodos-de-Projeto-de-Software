@@ -68,11 +68,11 @@ public class SqliteProfessorRepository implements ProfessorRepository {
     }
 
     private Professor mapRow(ResultSet rs) throws SQLException {
-        Professor professor = new Professor(
-                rs.getString("nome"),
-                LocalDate.parse(rs.getString("dt_nascimento")),
-                rs.getString("email")
-        );
+        Professor professor = new Professor.Builder()
+            .nome(rs.getString("nome"))
+            .dataNascimento(LocalDate.parse(rs.getString("dt_nascimento")))
+            .email(rs.getString("email"))
+            .build();
         professor.setId(rs.getLong("id"));
         return professor;
     }

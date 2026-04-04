@@ -68,11 +68,11 @@ public class SqliteAtendenteRepository implements AtendenteRepository {
     }
 
     private Atendente mapRow(ResultSet rs) throws SQLException {
-        Atendente atendente = new Atendente(
-                rs.getString("nome"),
-                LocalDate.parse(rs.getString("dt_nascimento")),
-                rs.getString("email")
-        );
+        Atendente atendente = new Atendente.Builder()
+            .nome(rs.getString("nome"))
+            .dataNascimento(LocalDate.parse(rs.getString("dt_nascimento")))
+            .email(rs.getString("email"))
+            .build();
         atendente.setId(rs.getLong("id"));
         return atendente;
     }

@@ -85,12 +85,12 @@ public class SqliteAlunoRepository implements AlunoRepository {
     }
 
     private Aluno mapRow(ResultSet rs) throws SQLException {
-        Aluno aluno = new Aluno(
-                rs.getString("nome"),
-                LocalDate.parse(rs.getString("dt_nascimento")),
-                rs.getString("email"),
-                rs.getInt("matricula")
-        );
+        Aluno aluno = new Aluno.Builder()
+            .nome(rs.getString("nome"))
+            .dataNascimento(LocalDate.parse(rs.getString("dt_nascimento")))
+            .email(rs.getString("email"))
+            .matricula(rs.getInt("matricula"))
+            .build();
         aluno.setId(rs.getLong("id"));
         return aluno;
     }
