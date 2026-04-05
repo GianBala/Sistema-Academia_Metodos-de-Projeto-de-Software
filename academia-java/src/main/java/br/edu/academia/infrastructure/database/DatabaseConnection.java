@@ -14,19 +14,27 @@ import java.util.stream.Collectors;
 public class DatabaseConnection {
 
     private static final String DB_URL = "jdbc:sqlite:data/academia.db";
+    private static DatabaseConnection instance;
     private final Connection connection;
 
-    public DatabaseConnection() {
+    private DatabaseConnection() {
         this(DB_URL);
     }
 
-    public DatabaseConnection(String url) {
+    DatabaseConnection(String url) {
         try {
             this.connection = DriverManager.getConnection(url);
             initializeSchema();
         } catch (SQLException e) {
             throw new RuntimeException("Erro ao conectar ao banco de dados.", e);
         }
+    }
+
+    public static synchronized DatabaseConnection getInstance() {
+        if (instance == null) {
+            instance = new DatabaseConnection();
+        }
+        return instance;
     }
 
     public Connection getConnection() {

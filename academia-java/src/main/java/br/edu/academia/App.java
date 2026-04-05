@@ -11,7 +11,7 @@ import java.util.Scanner;
 public class App {
 
     public static void main(String[] args) {
-        DatabaseConnection db = new DatabaseConnection();
+        DatabaseConnection db = DatabaseConnection.getInstance();
 
         var connection = db.getConnection();
         var alunoRepo = new SqliteAlunoRepository(connection);
