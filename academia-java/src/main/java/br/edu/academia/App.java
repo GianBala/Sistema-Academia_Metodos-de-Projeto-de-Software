@@ -5,7 +5,9 @@ import br.edu.academia.infrastructure.database.*;
 import br.edu.academia.infrastructure.security.BCryptPasswordHasher;
 import br.edu.academia.infrastructure.security.PasswordHasher;
 import br.edu.academia.ui.console.*;
+import br.edu.academia.ui.console.command.*;
 
+import java.util.Map;
 import java.util.Scanner;
 
 public class App {
@@ -30,10 +32,18 @@ public class App {
         var scanner = new Scanner(System.in);
         var console = new ConsoleUtils(scanner);
 
-        var menuCadastrar = new MenuCadastrarUsuario(
+        Map<String, Command> comandosCadastro = Map.of(
+                "1", new CadastrarAdministradorCommand(adminService, console),
+                "2", new CadastrarAlunoCommand(alunoService, console),
+                "3", new CadastrarProfessorCommand(professorService, console),
+                "4", new CadastrarAtendenteCommand(atendenteService, console)
+        );
+
+        Command listarCommand = new ListarUsuariosCommand(
                 alunoService, professorService, atendenteService, adminService, console);
-        var menuListar = new MenuListarUsuario(
-                alunoService, professorService, atendenteService, adminService, console);
+
+        var menuCadastrar = new MenuCadastrarUsuario(comandosCadastro, console);
+        var menuListar = new MenuListarUsuario(listarCommand, console);
         var menuPrincipal = new MenuPrincipal(menuCadastrar, menuListar, console);
 
         menuPrincipal.executar();
