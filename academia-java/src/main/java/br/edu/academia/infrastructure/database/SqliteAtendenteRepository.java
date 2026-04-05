@@ -67,6 +67,17 @@ public class SqliteAtendenteRepository implements AtendenteRepository {
         return Optional.empty();
     }
 
+    @Override
+    public void delete(long id) {
+        String sql = "DELETE FROM atendentes WHERE id = ?";
+        try (PreparedStatement stmt = connection.prepareStatement(sql)) {
+            stmt.setLong(1, id);
+            stmt.executeUpdate();
+        } catch (SQLException e) {
+            throw new RuntimeException("Erro ao deletar atendente.", e);
+        }
+    }
+
     private Atendente mapRow(ResultSet rs) throws SQLException {
         Atendente atendente = new Atendente.Builder()
             .nome(rs.getString("nome"))

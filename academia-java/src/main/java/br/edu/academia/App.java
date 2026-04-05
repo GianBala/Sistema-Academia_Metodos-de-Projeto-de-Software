@@ -1,5 +1,8 @@
 package br.edu.academia;
 
+import br.edu.academia.domain.memento.HistoricoOperacoes;
+import br.edu.academia.domain.memento.TipoEntidade;
+import br.edu.academia.domain.repository.Repository;
 import br.edu.academia.domain.service.*;
 import br.edu.academia.infrastructure.database.*;
 import br.edu.academia.infrastructure.security.BCryptPasswordHasher;
@@ -24,10 +27,18 @@ public class App {
         MatriculaGenerator matriculaGenerator = new RandomMatriculaGenerator(alunoRepo);
         PasswordHasher passwordHasher = new BCryptPasswordHasher();
 
-        var alunoService = new AlunoService(alunoRepo, matriculaGenerator);
-        var professorService = new ProfessorService(professorRepo);
-        var atendenteService = new AtendenteService(atendenteRepo);
-        var adminService = new AdministradorService(adminRepo, passwordHasher);
+        Map<TipoEntidade, Repository<?>> repositoriosPorTipo = Map.of(
+                TipoEntidade.ALUNO, alunoRepo,
+                TipoEntidade.PROFESSOR, professorRepo,
+                TipoEntidade.ATENDENTE, atendenteRepo,
+                TipoEntidade.ADMINISTRADOR, adminRepo
+        );
+        var historico = new HistoricoOperacoes(repositoriosPorTipo);
+
+        var alunoService = new AlunoService(alunoRepo, matriculaGenerator, historico);
+        var professorService = new ProfessorService(professorRepo, historico);
+        var atendenteService = new AtendenteService(atendenteRepo, historico);
+        var adminService = new AdministradorService(adminRepo, passwordHasher, historico);
 
         var scanner = new Scanner(System.in);
         var console = new ConsoleUtils(scanner);
@@ -41,10 +52,11 @@ public class App {
 
         Command listarCommand = new ListarUsuariosCommand(
                 alunoService, professorService, atendenteService, adminService, console);
+        Command desfazerCommand = new DesfazerCommand(historico, console);
 
         var menuCadastrar = new MenuCadastrarUsuario(comandosCadastro, console);
         var menuListar = new MenuListarUsuario(listarCommand, console);
-        var menuPrincipal = new MenuPrincipal(menuCadastrar, menuListar, console);
+        var menuPrincipal = new MenuPrincipal(menuCadastrar, menuListar, desfazerCommand, console);
 
         menuPrincipal.executar();
 

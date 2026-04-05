@@ -85,6 +85,17 @@ public class SqliteAdministradorRepository implements AdministradorRepository {
         return Optional.empty();
     }
 
+    @Override
+    public void delete(long id) {
+        String sql = "DELETE FROM administradores WHERE id = ?";
+        try (PreparedStatement stmt = connection.prepareStatement(sql)) {
+            stmt.setLong(1, id);
+            stmt.executeUpdate();
+        } catch (SQLException e) {
+            throw new RuntimeException("Erro ao deletar administrador.", e);
+        }
+    }
+
     private Administrador mapRow(ResultSet rs) throws SQLException {
         Administrador admin = new Administrador.Builder()
             .nome(rs.getString("nome"))

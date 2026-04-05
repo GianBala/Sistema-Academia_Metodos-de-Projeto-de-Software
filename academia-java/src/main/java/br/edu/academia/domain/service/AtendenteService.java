@@ -1,6 +1,9 @@
 package br.edu.academia.domain.service;
 
 import br.edu.academia.domain.entity.Atendente;
+import br.edu.academia.domain.memento.CadastroMemento;
+import br.edu.academia.domain.memento.HistoricoOperacoes;
+import br.edu.academia.domain.memento.TipoEntidade;
 import br.edu.academia.domain.repository.AtendenteRepository;
 import br.edu.academia.domain.validation.DataNascimentoValidator;
 import br.edu.academia.domain.validation.EmailValidator;
@@ -18,9 +21,11 @@ public class AtendenteService {
     private final DataNascimentoValidator dataValidator;
     private final EmailValidator emailValidator;
     private final IdadeMinimaPredicate idadeValidator;
+    private final HistoricoOperacoes historico;
 
-    public AtendenteService(AtendenteRepository repository) {
+    public AtendenteService(AtendenteRepository repository, HistoricoOperacoes historico) {
         this.repository = repository;
+        this.historico = historico;
         this.dataValidator = new DataNascimentoValidator();
         this.emailValidator = new EmailValidator();
         this.idadeValidator = new IdadeMinimaPredicate(IDADE_MINIMA_FUNCIONARIO);
@@ -49,6 +54,7 @@ public class AtendenteService {
                     .email(email)
                     .build();
         repository.save(atendente);
+        historico.registrar(new CadastroMemento(atendente.getId(), TipoEntidade.ATENDENTE, "Atendente: " + atendente.getNome()));
         return atendente;
     }
 

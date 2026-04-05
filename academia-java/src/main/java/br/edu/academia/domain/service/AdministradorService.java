@@ -1,6 +1,9 @@
 package br.edu.academia.domain.service;
 
 import br.edu.academia.domain.entity.Administrador;
+import br.edu.academia.domain.memento.CadastroMemento;
+import br.edu.academia.domain.memento.HistoricoOperacoes;
+import br.edu.academia.domain.memento.TipoEntidade;
 import br.edu.academia.domain.repository.AdministradorRepository;
 import br.edu.academia.domain.validation.*;
 import br.edu.academia.infrastructure.security.PasswordHasher;
@@ -15,10 +18,13 @@ public class AdministradorService {
     private final DataNascimentoValidator dataValidator;
     private final EmailValidator emailValidator;
     private final LoginValidator loginValidator;
+    private final HistoricoOperacoes historico;
 
-    public AdministradorService(AdministradorRepository repository, PasswordHasher passwordHasher) {
+    public AdministradorService(AdministradorRepository repository, PasswordHasher passwordHasher,
+                                HistoricoOperacoes historico) {
         this.repository = repository;
         this.passwordHasher = passwordHasher;
+        this.historico = historico;
         this.dataValidator = new DataNascimentoValidator();
         this.emailValidator = new EmailValidator();
         this.loginValidator = new LoginValidator();
@@ -52,6 +58,7 @@ public class AdministradorService {
                     .senhaHash(senhaHash)
                     .build();
         repository.save(admin);
+        historico.registrar(new CadastroMemento(admin.getId(), TipoEntidade.ADMINISTRADOR, "Administrador: " + admin.getNome()));
         return admin;
     }
 

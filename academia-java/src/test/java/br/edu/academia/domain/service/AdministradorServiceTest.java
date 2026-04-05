@@ -1,6 +1,8 @@
 package br.edu.academia.domain.service;
 
 import br.edu.academia.domain.entity.Administrador;
+import br.edu.academia.domain.memento.HistoricoOperacoes;
+import br.edu.academia.domain.memento.TipoEntidade;
 import br.edu.academia.domain.repository.AdministradorRepository;
 import br.edu.academia.infrastructure.security.PasswordHasher;
 import org.junit.jupiter.api.BeforeEach;
@@ -8,6 +10,7 @@ import org.junit.jupiter.api.Test;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -31,7 +34,8 @@ class AdministradorServiceTest {
                 return hash.equals("hashed_" + plaintext);
             }
         };
-        service = new AdministradorService(repository, hasher);
+        var historico = new HistoricoOperacoes(Map.of(TipoEntidade.ADMINISTRADOR, repository));
+        service = new AdministradorService(repository, hasher, historico);
     }
 
     @Test
@@ -87,6 +91,11 @@ class AdministradorServiceTest {
         @Override
         public Optional<Administrador> findByLogin(String login) {
             return admins.stream().filter(a -> a.getLogin().equals(login)).findFirst();
+        }
+
+        @Override
+        public void delete(long id) {
+            admins.removeIf(a -> a.getId() == id);
         }
     }
 }

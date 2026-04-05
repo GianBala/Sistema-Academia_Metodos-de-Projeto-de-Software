@@ -9,4 +9,6 @@ public interface Repository<T> {
     List<T> findAll();
 
     Optional<T> findById(long id);
+
+    void delete(long id);
 }
