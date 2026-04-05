@@ -67,6 +67,17 @@ public class SqliteProfessorRepository implements ProfessorRepository {
         return Optional.empty();
     }
 
+    @Override
+    public void delete(long id) {
+        String sql = "DELETE FROM professores WHERE id = ?";
+        try (PreparedStatement stmt = connection.prepareStatement(sql)) {
+            stmt.setLong(1, id);
+            stmt.executeUpdate();
+        } catch (SQLException e) {
+            throw new RuntimeException("Erro ao deletar professor.", e);
+        }
+    }
+
     private Professor mapRow(ResultSet rs) throws SQLException {
         Professor professor = new Professor.Builder()
             .nome(rs.getString("nome"))

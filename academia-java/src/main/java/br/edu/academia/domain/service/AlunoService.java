@@ -1,6 +1,9 @@
 package br.edu.academia.domain.service;
 
 import br.edu.academia.domain.entity.Aluno;
+import br.edu.academia.domain.memento.CadastroMemento;
+import br.edu.academia.domain.memento.HistoricoOperacoes;
+import br.edu.academia.domain.memento.TipoEntidade;
 import br.edu.academia.domain.repository.AlunoRepository;
 import br.edu.academia.domain.validation.DataNascimentoValidator;
 import br.edu.academia.domain.validation.EmailValidator;
@@ -15,10 +18,13 @@ public class AlunoService {
     private final MatriculaGenerator matriculaGenerator;
     private final DataNascimentoValidator dataValidator;
     private final EmailValidator emailValidator;
+    private final HistoricoOperacoes historico;
 
-    public AlunoService(AlunoRepository repository, MatriculaGenerator matriculaGenerator) {
+    public AlunoService(AlunoRepository repository, MatriculaGenerator matriculaGenerator,
+                        HistoricoOperacoes historico) {
         this.repository = repository;
         this.matriculaGenerator = matriculaGenerator;
+        this.historico = historico;
         this.dataValidator = new DataNascimentoValidator();
         this.emailValidator = new EmailValidator();
     }
@@ -43,6 +49,7 @@ public class AlunoService {
                     .matricula(matricula)
                     .build();
         repository.save(aluno);
+        historico.registrar(new CadastroMemento(aluno.getId(), TipoEntidade.ALUNO, "Aluno: " + aluno.getNome()));
         return aluno;
     }
 

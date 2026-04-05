@@ -84,6 +84,17 @@ public class SqliteAlunoRepository implements AlunoRepository {
         return Optional.empty();
     }
 
+    @Override
+    public void delete(long id) {
+        String sql = "DELETE FROM alunos WHERE id = ?";
+        try (PreparedStatement stmt = connection.prepareStatement(sql)) {
+            stmt.setLong(1, id);
+            stmt.executeUpdate();
+        } catch (SQLException e) {
+            throw new RuntimeException("Erro ao deletar aluno.", e);
+        }
+    }
+
     private Aluno mapRow(ResultSet rs) throws SQLException {
         Aluno aluno = new Aluno.Builder()
             .nome(rs.getString("nome"))

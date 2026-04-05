@@ -1,6 +1,8 @@
 package br.edu.academia.domain.service;
 
 import br.edu.academia.domain.entity.Professor;
+import br.edu.academia.domain.memento.HistoricoOperacoes;
+import br.edu.academia.domain.memento.TipoEntidade;
 import br.edu.academia.domain.repository.ProfessorRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -8,6 +10,7 @@ import org.junit.jupiter.api.Test;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -20,7 +23,8 @@ class ProfessorServiceTest {
     @BeforeEach
     void setUp() {
         repository = new InMemoryProfessorRepository();
-        service = new ProfessorService(repository);
+        var historico = new HistoricoOperacoes(Map.of(TipoEntidade.PROFESSOR, repository));
+        service = new ProfessorService(repository, historico);
     }
 
     @Test
@@ -70,6 +74,11 @@ class ProfessorServiceTest {
         @Override
         public Optional<Professor> findById(long id) {
             return professores.stream().filter(p -> p.getId() == id).findFirst();
+        }
+
+        @Override
+        public void delete(long id) {
+            professores.removeIf(p -> p.getId() == id);
         }
     }
 }
