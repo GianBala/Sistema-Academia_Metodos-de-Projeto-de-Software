@@ -14,8 +14,8 @@ public class Aluno extends Entidade {
     public int getMatricula() { return matricula; }
 
     @Override
-    public String infos() {
-        return super.infos() + String.format(" | Matricula: %d", matricula);
+    protected String detalhesAdicionais() {
+        return String.format("Matricula: %d", matricula);
     }
 
     public static class Builder extends BuilderBase<Builder> {

@@ -26,10 +26,17 @@ public abstract class Entidade {
         return Period.between(dataNascimento, LocalDate.now()).getYears();
     }
 
-    public String infos() {
-        return String.format("Nome: %s | Idade: %d | Email: %s | Cargo: %s",
+    public final String infos() {
+        String base = String.format("Nome: %s | Idade: %d | Email: %s | Cargo: %s",
                 nome, getIdade(), email, getCargo());
+        String detalhes = detalhesAdicionais();
+        if (detalhes != null && !detalhes.isEmpty()) {
+            return base + " | " + detalhes;
+        }
+        return base;
     }
+
+    protected abstract String detalhesAdicionais();
 
     protected String getCargo() {
         return getClass().getSimpleName();
