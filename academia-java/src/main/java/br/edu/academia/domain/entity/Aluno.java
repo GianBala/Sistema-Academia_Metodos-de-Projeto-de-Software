@@ -28,6 +28,10 @@ public class Aluno extends Entidade {
 
         @Override
         public Aluno build() {
+            validarCamposBase();
+            if (matricula <= 0) {
+                throw new IllegalStateException("Matrícula é obrigatória e deve ser positiva.");
+            }
             return new Aluno(this);
         }
     }

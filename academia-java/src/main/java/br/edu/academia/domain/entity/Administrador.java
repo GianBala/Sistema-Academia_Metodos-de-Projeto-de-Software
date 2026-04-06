@@ -37,6 +37,13 @@ public class Administrador extends Entidade {
 
         @Override
         public Administrador build() {
+            validarCamposBase();
+            if (login == null || login.isBlank()) {
+                throw new IllegalStateException("Login é obrigatório.");
+            }
+            if (senhaHash == null || senhaHash.isBlank()) {
+                throw new IllegalStateException("Senha hash é obrigatória.");
+            }
             return new Administrador(this);
         }
     }

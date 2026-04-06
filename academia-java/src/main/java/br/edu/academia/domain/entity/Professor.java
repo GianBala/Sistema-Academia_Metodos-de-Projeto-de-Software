@@ -24,6 +24,7 @@ public class Professor extends Funcionario {
     public static class Builder extends BuilderBase<Builder> {
         @Override
         public Professor build() {
+            validarCamposBase();
             return new Professor(this);
         }
     }

@@ -9,6 +9,7 @@ public class Atendente extends Funcionario {
     public static class Builder extends BuilderBase<Builder> {
         @Override
         public Atendente build() {
+            validarCamposBase();
             return new Atendente(this);
         }
     }

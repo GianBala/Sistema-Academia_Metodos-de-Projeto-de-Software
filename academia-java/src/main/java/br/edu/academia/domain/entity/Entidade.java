@@ -71,6 +71,18 @@ public abstract class Entidade {
             return (T) this;
         }
 
+        protected void validarCamposBase() {
+            if (nome == null || nome.isBlank()) {
+                throw new IllegalStateException("Nome é obrigatório.");
+            }
+            if (dataNascimento == null) {
+                throw new IllegalStateException("Data de nascimento é obrigatória.");
+            }
+            if (email == null || email.isBlank()) {
+                throw new IllegalStateException("Email é obrigatório.");
+            }
+        }
+
         public abstract Entidade build();
     }
 }
