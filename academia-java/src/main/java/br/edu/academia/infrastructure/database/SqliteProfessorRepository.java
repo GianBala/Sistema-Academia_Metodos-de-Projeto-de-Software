@@ -78,6 +78,20 @@ public class SqliteProfessorRepository implements ProfessorRepository {
         }
     }
 
+    @Override
+    public void update(Professor professor) {
+        String sql = "UPDATE professores SET nome = ?, dt_nascimento = ?, email = ? WHERE id = ?";
+        try (PreparedStatement stmt = connection.prepareStatement(sql)) {
+            stmt.setString(1, professor.getNome());
+            stmt.setString(2, professor.getDataNascimento().toString());
+            stmt.setString(3, professor.getEmail());
+            stmt.setLong(4, professor.getId());
+            stmt.executeUpdate();
+        } catch (SQLException e) {
+            throw new RuntimeException("Erro ao atualizar professor.", e);
+        }
+    }
+
     private Professor mapRow(ResultSet rs) throws SQLException {
         Professor professor = new Professor.Builder()
             .nome(rs.getString("nome"))

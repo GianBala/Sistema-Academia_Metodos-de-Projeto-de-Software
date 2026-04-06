@@ -96,6 +96,22 @@ public class SqliteAdministradorRepository implements AdministradorRepository {
         }
     }
 
+    @Override
+    public void update(Administrador admin) {
+        String sql = "UPDATE administradores SET nome = ?, dt_nascimento = ?, email = ?, login = ?, senha_hash = ? WHERE id = ?";
+        try (PreparedStatement stmt = connection.prepareStatement(sql)) {
+            stmt.setString(1, admin.getNome());
+            stmt.setString(2, admin.getDataNascimento().toString());
+            stmt.setString(3, admin.getEmail());
+            stmt.setString(4, admin.getLogin());
+            stmt.setString(5, admin.getSenhaHash());
+            stmt.setLong(6, admin.getId());
+            stmt.executeUpdate();
+        } catch (SQLException e) {
+            throw new RuntimeException("Erro ao atualizar administrador.", e);
+        }
+    }
+
     private Administrador mapRow(ResultSet rs) throws SQLException {
         Administrador admin = new Administrador.Builder()
             .nome(rs.getString("nome"))

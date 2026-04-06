@@ -95,6 +95,21 @@ public class SqliteAlunoRepository implements AlunoRepository {
         }
     }
 
+    @Override
+    public void update(Aluno aluno) {
+        String sql = "UPDATE alunos SET nome = ?, dt_nascimento = ?, email = ?, matricula = ? WHERE id = ?";
+        try (PreparedStatement stmt = connection.prepareStatement(sql)) {
+            stmt.setString(1, aluno.getNome());
+            stmt.setString(2, aluno.getDataNascimento().toString());
+            stmt.setString(3, aluno.getEmail());
+            stmt.setInt(4, aluno.getMatricula());
+            stmt.setLong(5, aluno.getId());
+            stmt.executeUpdate();
+        } catch (SQLException e) {
+            throw new RuntimeException("Erro ao atualizar aluno.", e);
+        }
+    }
+
     private Aluno mapRow(ResultSet rs) throws SQLException {
         Aluno aluno = new Aluno.Builder()
             .nome(rs.getString("nome"))
