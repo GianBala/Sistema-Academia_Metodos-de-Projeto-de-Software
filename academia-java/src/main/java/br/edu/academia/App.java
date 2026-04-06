@@ -3,8 +3,10 @@ package br.edu.academia;
 import br.edu.academia.domain.memento.HistoricoOperacoes;
 import br.edu.academia.domain.memento.TipoEntidade;
 import br.edu.academia.domain.repository.Repository;
+import br.edu.academia.domain.repository.RepositoryFactory;
 import br.edu.academia.domain.service.*;
-import br.edu.academia.infrastructure.database.*;
+import br.edu.academia.infrastructure.database.DatabaseConnection;
+import br.edu.academia.infrastructure.database.SqliteRepositoryFactory;
 import br.edu.academia.infrastructure.security.BCryptPasswordHasher;
 import br.edu.academia.infrastructure.security.PasswordHasher;
 import br.edu.academia.ui.console.*;
@@ -18,11 +20,11 @@ public class App {
     public static void main(String[] args) {
         DatabaseConnection db = DatabaseConnection.getInstance();
 
-        var connection = db.getConnection();
-        var alunoRepo = new SqliteAlunoRepository(connection);
-        var professorRepo = new SqliteProfessorRepository(connection);
-        var atendenteRepo = new SqliteAtendenteRepository(connection);
-        var adminRepo = new SqliteAdministradorRepository(connection);
+        RepositoryFactory factory = new SqliteRepositoryFactory(db.getConnection());
+        var alunoRepo = factory.createAlunoRepository();
+        var professorRepo = factory.createProfessorRepository();
+        var atendenteRepo = factory.createAtendenteRepository();
+        var adminRepo = factory.createAdministradorRepository();
 
         MatriculaGenerator matriculaGenerator = new RandomMatriculaGenerator(alunoRepo);
         PasswordHasher passwordHasher = new BCryptPasswordHasher();
