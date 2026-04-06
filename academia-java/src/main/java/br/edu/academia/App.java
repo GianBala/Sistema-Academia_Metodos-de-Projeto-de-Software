@@ -52,11 +52,11 @@ public class App {
 
         Command listarCommand = new ListarUsuariosCommand(
                 alunoService, professorService, atendenteService, adminService, console);
-        Command desfazerCommand = new DesfazerCommand(historico, console);
-
-        var menuCadastrar = new MenuCadastrarUsuario(comandosCadastro, console);
-        var menuListar = new MenuListarUsuario(listarCommand, console);
-        var menuPrincipal = new MenuPrincipal(menuCadastrar, menuListar, desfazerCommand, console);
+        
+        var relatorio = new RelatorioService(
+            "Relatório final", alunoRepo, professorRepo, atendenteRepo, adminRepo);
+        
+        var menuPrincipal = new MenuPrincipal(menuCadastrar, menuListar, console, relatorio);
 
         menuPrincipal.executar();
 
