@@ -1,6 +1,9 @@
 package br.edu.academia.domain.service;
 
 import br.edu.academia.domain.entity.Professor;
+import br.edu.academia.domain.memento.CadastroMemento;
+import br.edu.academia.domain.memento.HistoricoOperacoes;
+import br.edu.academia.domain.memento.TipoEntidade;
 import br.edu.academia.domain.repository.ProfessorRepository;
 import br.edu.academia.domain.validation.DataNascimentoValidator;
 import br.edu.academia.domain.validation.EmailValidator;
@@ -18,9 +21,11 @@ public class ProfessorService {
     private final DataNascimentoValidator dataValidator;
     private final EmailValidator emailValidator;
     private final IdadeMinimaPredicate idadeValidator;
+    private final HistoricoOperacoes historico;
 
-    public ProfessorService(ProfessorRepository repository) {
+    public ProfessorService(ProfessorRepository repository, HistoricoOperacoes historico) {
         this.repository = repository;
+        this.historico = historico;
         this.dataValidator = new DataNascimentoValidator();
         this.emailValidator = new EmailValidator();
         this.idadeValidator = new IdadeMinimaPredicate(IDADE_MINIMA_FUNCIONARIO);
@@ -50,6 +55,7 @@ public class ProfessorService {
                     .email(email)
                     .build();
         repository.save(professor);
+        historico.registrar(new CadastroMemento(professor.getId(), TipoEntidade.PROFESSOR, "Professor: " + professor.getNome()));
         return professor;
     }
 

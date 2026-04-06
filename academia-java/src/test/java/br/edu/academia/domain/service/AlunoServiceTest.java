@@ -1,12 +1,15 @@
 package br.edu.academia.domain.service;
 
 import br.edu.academia.domain.entity.Aluno;
+import br.edu.academia.domain.memento.HistoricoOperacoes;
+import br.edu.academia.domain.memento.TipoEntidade;
 import br.edu.academia.domain.repository.AlunoRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -20,7 +23,8 @@ class AlunoServiceTest {
     void setUp() {
         repository = new InMemoryAlunoRepository();
         MatriculaGenerator generator = () -> 1234;
-        service = new AlunoService(repository, generator);
+        var historico = new HistoricoOperacoes(Map.of(TipoEntidade.ALUNO, repository));
+        service = new AlunoService(repository, generator, historico);
     }
 
     @Test
@@ -75,6 +79,11 @@ class AlunoServiceTest {
         @Override
         public Optional<Aluno> findByMatricula(int matricula) {
             return alunos.stream().filter(a -> a.getMatricula() == matricula).findFirst();
+        }
+
+        @Override
+        public void delete(long id) {
+            alunos.removeIf(a -> a.getId() == id);
         }
     }
 }

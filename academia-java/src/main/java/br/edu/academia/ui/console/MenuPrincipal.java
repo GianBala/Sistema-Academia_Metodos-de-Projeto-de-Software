@@ -6,6 +6,7 @@ public class MenuPrincipal {
 
     private final MenuCadastrarUsuario menuCadastrar;
     private final MenuListarUsuario menuListar;
+    private final Command desfazerCommand;
     private final ConsoleUtils console;
     private final RelatorioService retorio;
 
@@ -15,6 +16,7 @@ public class MenuPrincipal {
                          RelatorioService retorio) {
         this.menuCadastrar = menuCadastrar;
         this.menuListar = menuListar;
+        this.desfazerCommand = desfazerCommand;
         this.console = console;
         this.retorio = retorio;
     }
