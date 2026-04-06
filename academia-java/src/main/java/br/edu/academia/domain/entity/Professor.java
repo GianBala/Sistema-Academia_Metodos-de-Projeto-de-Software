@@ -21,9 +21,15 @@ public class Professor extends Funcionario {
         return Collections.unmodifiableList(alunos);
     }
 
+    @Override
+    protected String detalhesAdicionais() {
+        return "";
+    }
+
     public static class Builder extends BuilderBase<Builder> {
         @Override
         public Professor build() {
+            validarCamposBase();
             return new Professor(this);
         }
     }

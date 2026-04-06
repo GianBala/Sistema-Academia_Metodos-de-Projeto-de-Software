@@ -14,7 +14,7 @@ import java.util.stream.Collectors;
 public class DatabaseConnection {
 
     private static final String DB_URL = "jdbc:sqlite:data/academia.db";
-    private static DatabaseConnection instance;
+    private static volatile DatabaseConnection instance;
     private final Connection connection;
 
     private DatabaseConnection() {
@@ -30,11 +30,20 @@ public class DatabaseConnection {
         }
     }
 
-    public static synchronized DatabaseConnection getInstance() {
+    public static DatabaseConnection getInstance() {
         if (instance == null) {
-            instance = new DatabaseConnection();
+            synchronized (DatabaseConnection.class) {
+                if (instance == null) {
+                    instance = new DatabaseConnection();
+                }
+            }
         }
         return instance;
+    }
+
+    @Override
+    protected Object clone() throws CloneNotSupportedException {
+        throw new CloneNotSupportedException("Clone nao permitido para Singleton.");
     }
 
     public Connection getConnection() {

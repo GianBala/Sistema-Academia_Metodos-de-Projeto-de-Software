@@ -78,6 +78,20 @@ public class SqliteAtendenteRepository implements AtendenteRepository {
         }
     }
 
+    @Override
+    public void update(Atendente atendente) {
+        String sql = "UPDATE atendentes SET nome = ?, dt_nascimento = ?, email = ? WHERE id = ?";
+        try (PreparedStatement stmt = connection.prepareStatement(sql)) {
+            stmt.setString(1, atendente.getNome());
+            stmt.setString(2, atendente.getDataNascimento().toString());
+            stmt.setString(3, atendente.getEmail());
+            stmt.setLong(4, atendente.getId());
+            stmt.executeUpdate();
+        } catch (SQLException e) {
+            throw new RuntimeException("Erro ao atualizar atendente.", e);
+        }
+    }
+
     private Atendente mapRow(ResultSet rs) throws SQLException {
         Atendente atendente = new Atendente.Builder()
             .nome(rs.getString("nome"))

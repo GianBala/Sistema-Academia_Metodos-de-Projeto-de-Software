@@ -17,8 +17,8 @@ public class Administrador extends Entidade {
     public String getSenhaHash() { return senhaHash; }
 
     @Override
-    public String infos() {
-        return super.infos() + String.format(" | Login: %s", login);
+    protected String detalhesAdicionais() {
+        return String.format("Login: %s", login);
     }
 
     public static class Builder extends BuilderBase<Builder> {
@@ -37,6 +37,13 @@ public class Administrador extends Entidade {
 
         @Override
         public Administrador build() {
+            validarCamposBase();
+            if (login == null || login.isBlank()) {
+                throw new IllegalStateException("Login é obrigatório.");
+            }
+            if (senhaHash == null || senhaHash.isBlank()) {
+                throw new IllegalStateException("Senha hash é obrigatória.");
+            }
             return new Administrador(this);
         }
     }

@@ -26,10 +26,17 @@ public abstract class Entidade {
         return Period.between(dataNascimento, LocalDate.now()).getYears();
     }
 
-    public String infos() {
-        return String.format("Nome: %s | Idade: %d | Email: %s | Cargo: %s",
+    public final String infos() {
+        String base = String.format("Nome: %s | Idade: %d | Email: %s | Cargo: %s",
                 nome, getIdade(), email, getCargo());
+        String detalhes = detalhesAdicionais();
+        if (detalhes != null && !detalhes.isEmpty()) {
+            return base + " | " + detalhes;
+        }
+        return base;
     }
+
+    protected abstract String detalhesAdicionais();
 
     protected String getCargo() {
         return getClass().getSimpleName();
@@ -69,6 +76,18 @@ public abstract class Entidade {
         public T email(String email) {
             this.email = email;
             return (T) this;
+        }
+
+        protected void validarCamposBase() {
+            if (nome == null || nome.isBlank()) {
+                throw new IllegalStateException("Nome é obrigatório.");
+            }
+            if (dataNascimento == null) {
+                throw new IllegalStateException("Data de nascimento é obrigatória.");
+            }
+            if (email == null || email.isBlank()) {
+                throw new IllegalStateException("Email é obrigatório.");
+            }
         }
 
         public abstract Entidade build();
