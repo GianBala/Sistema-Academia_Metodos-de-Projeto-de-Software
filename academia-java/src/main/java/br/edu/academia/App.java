@@ -34,7 +34,11 @@ public class App {
                 alunoService, professorService, atendenteService, adminService, console);
         var menuListar = new MenuListarUsuario(
                 alunoService, professorService, atendenteService, adminService, console);
-        var menuPrincipal = new MenuPrincipal(menuCadastrar, menuListar, console);
+        
+        var relatorio = new RelatorioService(
+            "Relatório final", alunoRepo, professorRepo, atendenteRepo, adminRepo);
+        
+        var menuPrincipal = new MenuPrincipal(menuCadastrar, menuListar, console, relatorio);
 
         menuPrincipal.executar();
 
