@@ -1,43 +1,36 @@
 package br.edu.academia.domain.memento;
 
-import br.edu.academia.domain.repository.Repository;
-
 import java.util.ArrayDeque;
 import java.util.Deque;
-import java.util.Map;
 import java.util.Optional;
 
+/**
+ * Caretaker do padrão Memento.
+ * Mantém uma pilha de mementos e executa desfazer (undo).
+ * Suporta desfazer criação e atualização.
+ */
 public class HistoricoOperacoes {
 
-    private final Deque<CadastroMemento> historico = new ArrayDeque<>();
-    private final Map<TipoEntidade, Repository<?>> repositorios;
+    private final Deque<OperacaoMemento> historico = new ArrayDeque<>();
 
-    public HistoricoOperacoes(Map<TipoEntidade, Repository<?>> repositorios) {
-        this.repositorios = repositorios;
-    }
-
-    public void registrar(CadastroMemento memento) {
+    public void registrar(OperacaoMemento memento) {
         historico.push(memento);
     }
 
-    public Optional<CadastroMemento> desfazer() {
+    public Optional<OperacaoMemento> desfazer() {
         if (historico.isEmpty()) {
             return Optional.empty();
         }
-
-        CadastroMemento memento = historico.pop();
-        Repository<?> repository = repositorios.get(memento.getTipoEntidade());
-
-        if (repository == null) {
-            throw new IllegalStateException(
-                    "Repositorio nao encontrado para tipo: " + memento.getTipoEntidade());
-        }
-
-        repository.delete(memento.getEntidadeId());
+        OperacaoMemento memento = historico.pop();
+        memento.desfazer();
         return Optional.of(memento);
     }
 
     public boolean temHistorico() {
         return !historico.isEmpty();
+    }
+
+    public int tamanho() {
+        return historico.size();
     }
 }

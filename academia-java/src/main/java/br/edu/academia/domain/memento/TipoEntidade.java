@@ -4,5 +4,7 @@ public enum TipoEntidade {
     ALUNO,
     PROFESSOR,
     ATENDENTE,
-    ADMINISTRADOR
+    ADMINISTRADOR,
+    TURMA,
+    TREINO
 }
