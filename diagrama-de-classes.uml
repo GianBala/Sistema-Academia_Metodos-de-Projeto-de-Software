@@ -1,0 +1,804 @@
+@startuml
+skinparam classAttributeIconSize 0
+skinparam defaultFontSize 11
+skinparam shadowing false
+skinparam linetype ortho
+
+' ============================================================
+'  DIAGRAMA DE CLASSES — SISTEMA ACADEMIA (Java 17)
+'  10 Padroes de Projeto: Singleton, Builder, Factory Method,
+'  Template Method, Repository, Facade, Command, Memento,
+'  Adapter, Proxy
+' ============================================================
+
+' ==================== ENTITIES (Builder) ====================
+
+abstract class Entidade <<entity>> #FFCCCC {
+  - id : long
+  - nome : String
+  - dataNascimento : LocalDate
+  - email : String
+  - login : String
+  - senhaHash : String
+  --
+  # Entidade(BuilderBase<?> builder)
+  + getId() : long
+  + setId(id : long) : void
+  + getNome() : String
+  + getDataNascimento() : LocalDate
+  + getEmail() : String
+  + getLogin() : String
+  + getSenhaHash() : String
+  + getIdade() : int
+  + {final} **infos()** : String  <<Template Method>>
+  # {abstract} detalhesAdicionais() : String
+  # getCargo() : String
+  - formatarNome(nome : String) : String
+}
+
+abstract class "Entidade.BuilderBase<T>" as BuilderBase <<Builder>> #FFE0CC {
+  - nome : String
+  - dataNascimento : LocalDate
+  - email : String
+  - login : String
+  - senhaHash : String
+  --
+  + nome(nome : String) : T
+  + dataNascimento(dt : LocalDate) : T
+  + email(email : String) : T
+  + login(login : String) : T
+  + senhaHash(hash : String) : T
+  # validarCamposBase() : void
+  + {abstract} build() : Entidade
+}
+
+abstract class Funcionario <<entity>> #FFCCCC {
+  --
+  # Funcionario(BuilderBase<?> builder)
+}
+
+class Administrador <<entity>> #FFCCCC {
+  --
+  - Administrador(Builder builder)
+  # detalhesAdicionais() : String
+  ..Builder..
+  + {static} Builder extends BuilderBase<Builder>
+}
+
+class Professor <<entity>> #FFCCCC {
+  --
+  - Professor(Builder builder)
+  # detalhesAdicionais() : String
+  ..Builder..
+  + {static} Builder extends BuilderBase<Builder>
+}
+
+class Atendente <<entity>> #FFCCCC {
+  --
+  - Atendente(Builder builder)
+  # detalhesAdicionais() : String
+  ..Builder..
+  + {static} Builder extends BuilderBase<Builder>
+}
+
+class Aluno <<entity>> #FFCCCC {
+  - matricula : int
+  --
+  - Aluno(Builder builder)
+  + getMatricula() : int
+  # detalhesAdicionais() : String
+  ..Builder..
+  + {static} Builder extends BuilderBase<Builder>
+  + matricula(m : int) : Builder
+}
+
+class Turma <<entity>> #FFCCCC {
+  - id : long
+  - nome : String
+  - professorId : long
+  - horario : String
+  --
+  + getId() : long
+  + getNome() : String
+  + getProfessorId() : long
+  + getHorario() : String
+  + infos() : String
+  ..Builder..
+  + {static} Builder
+}
+
+class Treino <<entity>> #FFCCCC {
+  - id : long
+  - alunoId : long
+  - grupoMuscular : String
+  - exercicio : String
+  - repeticoes : int
+  - peso : double
+  - data : LocalDate
+  --
+  + getters()
+  + infos() : String
+  ..Builder..
+  + {static} Builder
+}
+
+' ==================== REPOSITORY (interfaces) ====================
+
+interface "Repository<T>" as Repository <<Repository>> #CCFFCC {
+  + save(entity : T) : void
+  + update(entity : T) : void
+  + delete(id : long) : void
+  + findAll() : List<T>
+  + findById(id : long) : Optional<T>
+}
+
+interface AlunoRepository <<Repository>> #CCFFCC {
+  + findByMatricula(m : int) : Optional<Aluno>
+  + findByLogin(login : String) : Optional<Aluno>
+}
+
+interface ProfessorRepository <<Repository>> #CCFFCC {
+  + findByLogin(login : String) : Optional<Professor>
+}
+
+interface AtendenteRepository <<Repository>> #CCFFCC {
+  + findByLogin(login : String) : Optional<Atendente>
+}
+
+interface AdministradorRepository <<Repository>> #CCFFCC {
+  + findByLogin(login : String) : Optional<Administrador>
+}
+
+interface TurmaRepository <<Repository>> #CCFFCC {
+  + findByProfessorId(id : long) : List<Turma>
+  + addAluno(turmaId : long, alunoId : long) : void
+  + removeAluno(turmaId : long, alunoId : long) : void
+  + findAlunoIds(turmaId : long) : List<Long>
+}
+
+interface TreinoRepository <<Repository>> #CCFFCC {
+  + findByAlunoId(alunoId : long) : List<Treino>
+}
+
+interface LoginHistoryRepository #CCFFCC {
+  + registrar(login : String, tipo : String, dt : LocalDateTime) : void
+  + contarLogins(tipo : String) : long
+  + ultimosLogins(limite : int) : List<String>
+  + loginsPorTipo() : Map<String, Long>
+}
+
+' ==================== FACTORY METHOD ====================
+
+abstract class RepositoryFactory <<Factory Method>> #99FF99 {
+  + {abstract} createAlunoRepository() : AlunoRepository
+  + {abstract} createProfessorRepository() : ProfessorRepository
+  + {abstract} createAtendenteRepository() : AtendenteRepository
+  + {abstract} createAdministradorRepository() : AdministradorRepository
+  + {abstract} createTurmaRepository() : TurmaRepository
+  + {abstract} createTreinoRepository() : TreinoRepository
+  + {abstract} createLoginHistoryRepository() : LoginHistoryRepository
+}
+
+class SqliteRepositoryFactory <<Factory Method>> #99FF99 {
+  - connection : Connection
+  --
+  + SqliteRepositoryFactory(conn : Connection)
+  + createAlunoRepository() : AlunoRepository
+  + createProfessorRepository() : ProfessorRepository
+  + createAtendenteRepository() : AtendenteRepository
+  + createAdministradorRepository() : AdministradorRepository
+  + createTurmaRepository() : TurmaRepository
+  + createTreinoRepository() : TreinoRepository
+  + createLoginHistoryRepository() : LoginHistoryRepository
+}
+
+' ==================== SQLITE IMPLEMENTATIONS ====================
+
+class SqliteAlunoRepository #DDFFDD
+class SqliteProfessorRepository #DDFFDD
+class SqliteAtendenteRepository #DDFFDD
+class SqliteAdministradorRepository #DDFFDD
+class SqliteTurmaRepository #DDFFDD
+class SqliteTreinoRepository #DDFFDD
+class SqliteLoginHistoryRepository #DDFFDD
+
+' ==================== SINGLETON (DatabaseConnection) ====================
+
+class DatabaseConnection <<Singleton>> #FFE0CC {
+  - {static} instance : DatabaseConnection {volatile}
+  - connection : Connection
+  --
+  - DatabaseConnection()
+  + DatabaseConnection(url : String)
+  + {static} getInstance() : DatabaseConnection
+  + getConnection() : Connection
+  + close() : void
+  # clone() : Object  <<throws CloneNotSupportedException>>
+  - initializeSchema() : void
+}
+
+' ==================== FACADE + SINGLETON ====================
+
+class AcademiaFacade <<Facade / Singleton>> #99FF99 {
+  - {static} instance : AcademiaFacade {volatile}
+  - alunoService : AlunoService
+  - professorService : ProfessorService
+  - atendenteService : AtendenteService
+  - administradorService : AdministradorService
+  - turmaService : TurmaService
+  - treinoService : TreinoService
+  ==
+  - AcademiaFacade()
+  + {static} init(servicos...) : void
+  + {static} getInstance() : AcademiaFacade
+  ==
+  + **contarEntidades()** : long
+  + **contarEntidadesPorTipo()** : Map<String, Integer>
+  + cadastrarAluno(...) : Aluno
+  + atualizarAluno(...) : Aluno
+  + deletarAluno(id) : void
+  + listarAlunos() : List<Aluno>
+  + buscarAluno(id) : Optional<Aluno>
+  .. (idem para Professor, Atendente, Administrador) ..
+  + cadastrarTurma(...) : Turma
+  + atualizarTurma(...) : Turma
+  + deletarTurma(id) : void
+  + listarTurmas() : List<Turma>
+  + adicionarAlunoATurma(...) : void
+  + listarTurmasDoProfessor(id) : List<Turma>
+  + listarAlunosDaTurma(id) : List<Long>
+  + cadastrarTreino(...) : Treino
+  + atualizarTreino(...) : Treino
+  + deletarTreino(id) : void
+  + listarTreinosDoAluno(id) : List<Treino>
+}
+
+interface "FacadeCommand<T>" as FacadeCommand <<Command>> #FFFFCC {
+  + execute() : T
+}
+
+' ==================== SERVICES ====================
+
+class AlunoService <<service>> #CCFFEE {
+  - repository : AlunoRepository
+  - matriculaGenerator : MatriculaGenerator
+  - passwordHasher : PasswordHasher
+  - historico : HistoricoOperacoes
+  - logger : Logger
+  --
+  + cadastrar(nome, data, email, login, senha) : Aluno
+  + atualizar(id, nome, data, email, login, senha) : Aluno
+  + deletar(id : long) : void
+  + buscarPorId(id : long) : Optional<Aluno>
+  + listarTodos() : List<Aluno>
+}
+
+class ProfessorService <<service>> #CCFFEE {
+  - repository : ProfessorRepository
+  - passwordHasher : PasswordHasher
+  - historico : HistoricoOperacoes
+  - logger : Logger
+  --
+  + cadastrar(nome, data, email, login, senha) : Professor
+  + atualizar(id, nome, data, email, login, senha) : Professor
+  + deletar(id) : void
+  + buscarPorId(id) : Optional<Professor>
+  + listarTodos() : List<Professor>
+}
+
+class AtendenteService <<service>> #CCFFEE {
+  - repository : AtendenteRepository
+  - passwordHasher : PasswordHasher
+  - historico : HistoricoOperacoes
+  - logger : Logger
+  --
+  + cadastrar(...) : Atendente
+  + atualizar(...) : Atendente
+  + deletar(id) : void
+  + buscarPorId(id) : Optional<Atendente>
+  + listarTodos() : List<Atendente>
+}
+
+class AdministradorService <<service>> #CCFFEE {
+  - repository : AdministradorRepository
+  - passwordHasher : PasswordHasher
+  - historico : HistoricoOperacoes
+  - logger : Logger
+  --
+  + cadastrar(...) : Administrador
+  + atualizar(...) : Administrador
+  + deletar(id) : void
+  + buscarPorId(id) : Optional<Administrador>
+  + listarTodos() : List<Administrador>
+}
+
+class TurmaService <<service>> #CCFFEE {
+  - repository : TurmaRepository
+  - historico : HistoricoOperacoes
+  - logger : Logger
+  --
+  + cadastrar(nome, professorId, horario) : Turma
+  + atualizar(id, nome, professorId, horario) : Turma
+  + deletar(id) : void
+  + adicionarAluno(turmaId, alunoId) : void
+  + removerAluno(turmaId, alunoId) : void
+  + listarAlunosDaTurma(turmaId) : List<Long>
+  + listarTurmasDoProfessor(profId) : List<Turma>
+  + buscarPorId(id) : Optional<Turma>
+  + listarTodos() : List<Turma>
+}
+
+class TreinoService <<service>> #CCFFEE {
+  - repository : TreinoRepository
+  - historico : HistoricoOperacoes
+  - logger : Logger
+  --
+  + cadastrar(alunoId, grupo, exerc, reps, peso) : Treino
+  + atualizar(id, grupo, exerc, reps, peso) : Treino
+  + deletar(id) : void
+  + listarPorAluno(alunoId) : List<Treino>
+  + buscarPorId(id) : Optional<Treino>
+  + listarTodos() : List<Treino>
+}
+
+class AuthenticationService <<service>> #CCFFEE {
+  - alunoRepo : AlunoRepository
+  - professorRepo : ProfessorRepository
+  - atendenteRepo : AtendenteRepository
+  - adminRepo : AdministradorRepository
+  - loginHistoryRepo : LoginHistoryRepository
+  - passwordHasher : PasswordHasher
+  - logger : Logger
+  --
+  + autenticar(login, senha) : Optional<AuthResult>
+}
+
+class AuthResult #CCFFEE {
+  - usuario : Entidade
+  - role : TipoEntidade
+  --
+  + getUsuario() : Entidade
+  + getRole() : TipoEntidade
+}
+
+class SessionContext <<static>> #CCFFEE {
+  - {static} currentUser : Entidade
+  - {static} currentRole : TipoEntidade
+  --
+  + {static} setSession(user, role) : void
+  + {static} clearSession() : void
+  + {static} getCurrentUser() : Entidade
+  + {static} getCurrentRole() : TipoEntidade
+  + {static} isAuthenticated() : boolean
+}
+
+' ==================== MEMENTO ====================
+
+class OperacaoMemento <<Memento>> #FFCCFF {
+  - tipoOperacao : TipoOperacao
+  - descricao : String
+  - timestamp : LocalDateTime
+  - acaoDesfazer : Runnable
+  --
+  + OperacaoMemento(tipo, desc, acao)
+  + desfazer() : void
+  + getTipoOperacao() : TipoOperacao
+  + getDescricao() : String
+  + getTimestamp() : LocalDateTime
+}
+
+class HistoricoOperacoes <<Caretaker>> #FFCCFF {
+  - historico : Deque<OperacaoMemento>
+  --
+  + registrar(memento : OperacaoMemento) : void
+  + desfazer() : Optional<OperacaoMemento>
+  + temHistorico() : boolean
+  + tamanho() : int
+}
+
+enum TipoOperacao <<Memento>> #FFCCFF {
+  CRIACAO
+  ATUALIZACAO
+}
+
+enum TipoEntidade #FFCCFF {
+  ALUNO
+  PROFESSOR
+  ATENDENTE
+  ADMINISTRADOR
+  TURMA
+  TREINO
+}
+
+' ==================== ADAPTER (Logging) ====================
+
+interface Logger <<Adapter Target>> #CCCCFF {
+  + info(msg : String) : void
+  + warn(msg : String) : void
+  + error(msg : String) : void
+  + debug(msg : String) : void
+}
+
+class JavaUtilLoggingAdapter <<Adapter>> #CCCCFF {
+  - julLogger : java.util.logging.Logger
+  --
+  + JavaUtilLoggingAdapter(nome : String)
+  + info(msg)   : void  <<Level.INFO>>
+  + warn(msg)   : void  <<Level.WARNING>>
+  + error(msg)  : void  <<Level.SEVERE>>
+  + debug(msg)  : void  <<Level.FINE>>
+}
+
+' ==================== PROXY ====================
+
+class "RepositoryProxy<T>" as RepositoryProxy <<Proxy>> #FFE0FF {
+  # delegate : Repository<T>
+  # tipoProtegido : TipoEntidade
+  --
+  + save(entity : T) : void
+  + update(entity : T) : void
+  + delete(id : long) : void
+  + findAll() : List<T>
+  + findById(id : long) : Optional<T>
+  # verificarPermissaoEscrita(op : String) : void
+  ..Regras de acesso..
+  ADMINISTRADOR: tudo permitido
+  ATENDENTE: ALUNO e PROFESSOR
+  PROFESSOR/ALUNO: somente leitura
+  null (pre-login): permitido (seed)
+}
+
+class AlunoRepositoryProxy <<Proxy>> #FFE0FF
+class ProfessorRepositoryProxy <<Proxy>> #FFE0FF
+class AtendenteRepositoryProxy <<Proxy>> #FFE0FF
+class AdministradorRepositoryProxy <<Proxy>> #FFE0FF
+
+' ==================== TEMPLATE METHOD (Relatorios) ====================
+
+abstract class RelatorioTemplate <<Template Method>> #FFFFCC {
+  + {final} **gerarRelatorio**(facade, loginHistory) : String
+  # {abstract} gerarCabecalho(dataHora : String) : String
+  # {abstract} gerarSecaoEntidades(contagens : Map) : String
+  # {abstract} gerarSecaoAcessos(logins : Map, ultimos : List) : String
+  # {abstract} gerarRodape() : String
+  # {abstract} montarDocumento(cab, ent, acess, rod) : String
+}
+
+class HTMLRelatorio <<Template Method>> #FFFFCC {
+  # gerarCabecalho(...) : String
+  # gerarSecaoEntidades(...) : String
+  # gerarSecaoAcessos(...) : String
+  # gerarRodape() : String
+  # montarDocumento(...) : String
+}
+
+class PDFRelatorio <<Template Method>> #FFFFCC {
+  # gerarCabecalho(...) : String
+  # gerarSecaoEntidades(...) : String
+  # gerarSecaoAcessos(...) : String
+  # gerarRodape() : String
+  # montarDocumento(...) : String
+}
+
+' ==================== COMMAND (UI) ====================
+
+interface Command <<Command>> #FFFFCC {
+  + execute() : void
+}
+
+class CadastrarAlunoCommand <<Command>> #FFFFCC {
+  - facade : AcademiaFacade
+  - console : ConsoleUtils
+  + execute() : void
+}
+
+class CadastrarProfessorCommand <<Command>> #FFFFCC
+class CadastrarAtendenteCommand <<Command>> #FFFFCC
+class CadastrarAdministradorCommand <<Command>> #FFFFCC
+
+class DesfazerCommand <<Command>> #FFFFCC {
+  - historico : HistoricoOperacoes
+  - console : ConsoleUtils
+  + execute() : void
+}
+
+class ListarUsuariosCommand <<Command>> #FFFFCC {
+  - facade : AcademiaFacade
+  - console : ConsoleUtils
+  + execute() : void
+}
+
+' ==================== BOUNDARIES (UI) ====================
+
+class MenuPrincipal <<boundary>> #FAFADD {
+  - menuLogin : MenuLogin
+  - facade : AcademiaFacade
+  - historico : HistoricoOperacoes
+  - loginHistory : LoginHistoryRepository
+  - console : ConsoleUtils
+  --
+  + executar() : void
+  - encaminharParaMenu(auth : AuthResult) : void
+}
+
+class MenuLogin <<boundary>> #FAFADD {
+  - authService : AuthenticationService
+  - console : ConsoleUtils
+  --
+  + executar() : Optional<AuthResult>
+}
+
+class MenuAdministrador <<boundary>> #FAFADD {
+  + executar() : void
+  .. CRUD total + relatorios + desfazer ..
+}
+
+class MenuAtendente <<boundary>> #FAFADD {
+  + executar() : void
+  .. CRUD alunos/professores + turmas ..
+}
+
+class MenuProfessor <<boundary>> #FAFADD {
+  + executar() : void
+  .. Turmas + treinos ..
+}
+
+class MenuAluno <<boundary>> #FAFADD {
+  + executar() : void
+  .. Ver dados + treinos ..
+}
+
+class MenuCadastrarUsuario <<boundary>> #FAFADD {
+  - comandos : Map<String, Command>
+  - console : ConsoleUtils
+  --
+  + executar() : void
+}
+
+class MenuListarUsuario <<boundary>> #FAFADD {
+  - listarCommand : Command
+  - console : ConsoleUtils
+  --
+  + executar() : void
+}
+
+class ConsoleUtils <<boundary>> #FAFADD {
+  - scanner : Scanner
+  --
+  + clearConsole() : void
+  + readInput(prompt : String) : String
+  + waitForEnter() : void
+  + printHeader(title : String) : void
+}
+
+' ==================== VALIDATION ====================
+
+interface "Validator<T>" as Validator <<utility>> #CCCCFF {
+  + validate(value : T) : ValidationResult
+}
+
+class LoginValidator <<utility>> #CCCCFF {
+  + validate(login : String) : ValidationResult
+  ..Regras..
+  Nao pode ser vazio
+  Nao pode conter digitos
+  Maximo 12 caracteres
+}
+
+class SenhaValidator <<utility>> #CCCCFF {
+  - nome : String
+  - email : String
+  + validate(senha : String) : ValidationResult
+  ..Regras (AWS IAM)..
+  8-128 caracteres
+  Min 3 de 4 tipos: A-Z, a-z, 0-9, especial
+  Diferente de nome/email
+}
+
+class EmailValidator <<utility>> #CCCCFF {
+  + validate(email : String) : ValidationResult
+}
+
+class DataNascimentoValidator <<utility>> #CCCCFF {
+  + validate(data : String) : ValidationResult
+  + parse(data : String) : LocalDate
+}
+
+class IdadeMinimaPredicate <<utility>> #CCCCFF {
+  - idadeMinima : int
+  + validate(dt : LocalDate) : ValidationResult
+}
+
+class ValidationResult <<utility>> #CCCCFF {
+  - errors : List<String>
+  + {static} ok() : ValidationResult
+  + {static} error(msg : String) : ValidationResult
+  + {static} merge(results : List) : ValidationResult
+  + isValid() : boolean
+  + getErrors() : List<String>
+  + getErrorMessage() : String
+}
+
+' ==================== SECURITY ====================
+
+interface PasswordHasher <<security>> #DDDDFF {
+  + hash(plaintext : String) : String
+  + verify(plaintext : String, hash : String) : boolean
+}
+
+class BCryptPasswordHasher <<security>> #DDDDFF {
+  + hash(plaintext : String) : String
+  + verify(plaintext : String, hash : String) : boolean
+}
+
+interface MatriculaGenerator <<service>> #CCFFEE {
+  + generate() : int
+}
+
+class RandomMatriculaGenerator <<service>> #CCFFEE {
+  - alunoRepository : AlunoRepository
+  + generate() : int
+}
+
+' ==================== HERANCA ====================
+
+Entidade <|-- Funcionario
+Entidade <|-- Aluno
+Entidade <|-- Administrador
+Funcionario <|-- Professor
+Funcionario <|-- Atendente
+
+Entidade +-- BuilderBase : inner class
+
+' Repository hierarchy
+Repository <|-- AlunoRepository
+Repository <|-- ProfessorRepository
+Repository <|-- AtendenteRepository
+Repository <|-- AdministradorRepository
+Repository <|-- TurmaRepository
+Repository <|-- TreinoRepository
+
+' SQLite implements repositories
+AlunoRepository <|.. SqliteAlunoRepository
+ProfessorRepository <|.. SqliteProfessorRepository
+AtendenteRepository <|.. SqliteAtendenteRepository
+AdministradorRepository <|.. SqliteAdministradorRepository
+TurmaRepository <|.. SqliteTurmaRepository
+TreinoRepository <|.. SqliteTreinoRepository
+LoginHistoryRepository <|.. SqliteLoginHistoryRepository
+
+' Factory Method
+RepositoryFactory <|-- SqliteRepositoryFactory
+SqliteRepositoryFactory ..> SqliteAlunoRepository : creates
+SqliteRepositoryFactory ..> SqliteProfessorRepository : creates
+SqliteRepositoryFactory ..> SqliteTurmaRepository : creates
+SqliteRepositoryFactory ..> SqliteTreinoRepository : creates
+
+' Adapter
+Logger <|.. JavaUtilLoggingAdapter
+
+' Proxy hierarchy
+Repository <|.. RepositoryProxy
+RepositoryProxy <|-- AlunoRepositoryProxy
+RepositoryProxy <|-- ProfessorRepositoryProxy
+RepositoryProxy <|-- AtendenteRepositoryProxy
+RepositoryProxy <|-- AdministradorRepositoryProxy
+AlunoRepository <|.. AlunoRepositoryProxy
+ProfessorRepository <|.. ProfessorRepositoryProxy
+AtendenteRepository <|.. AtendenteRepositoryProxy
+AdministradorRepository <|.. AdministradorRepositoryProxy
+
+' Template Method
+RelatorioTemplate <|-- HTMLRelatorio
+RelatorioTemplate <|-- PDFRelatorio
+
+' Command hierarchy
+Command <|.. CadastrarAlunoCommand
+Command <|.. CadastrarProfessorCommand
+Command <|.. CadastrarAtendenteCommand
+Command <|.. CadastrarAdministradorCommand
+Command <|.. DesfazerCommand
+Command <|.. ListarUsuariosCommand
+
+' Security
+PasswordHasher <|.. BCryptPasswordHasher
+MatriculaGenerator <|.. RandomMatriculaGenerator
+
+' Validator hierarchy
+Validator <|.. LoginValidator
+Validator <|.. SenhaValidator
+Validator <|.. EmailValidator
+Validator <|.. DataNascimentoValidator
+Validator <|.. IdadeMinimaPredicate
+
+' ==================== ASSOCIACOES ====================
+
+' Facade -> Services
+AcademiaFacade *--> AlunoService : delega
+AcademiaFacade *--> ProfessorService : delega
+AcademiaFacade *--> AtendenteService : delega
+AcademiaFacade *--> AdministradorService : delega
+AcademiaFacade *--> TurmaService : delega
+AcademiaFacade *--> TreinoService : delega
+AcademiaFacade ..> FacadeCommand : usa internamente
+
+' Services -> Repositories
+AlunoService --> AlunoRepository : usa
+ProfessorService --> ProfessorRepository : usa
+AtendenteService --> AtendenteRepository : usa
+AdministradorService --> AdministradorRepository : usa
+TurmaService --> TurmaRepository : usa
+TreinoService --> TreinoRepository : usa
+
+' Services -> Memento
+AlunoService --> HistoricoOperacoes : registra
+ProfessorService --> HistoricoOperacoes : registra
+AtendenteService --> HistoricoOperacoes : registra
+AdministradorService --> HistoricoOperacoes : registra
+TurmaService --> HistoricoOperacoes : registra
+TreinoService --> HistoricoOperacoes : registra
+HistoricoOperacoes o--> OperacaoMemento : Deque
+
+' Services -> Logger + PasswordHasher
+AlunoService --> Logger : usa
+AlunoService --> PasswordHasher : usa
+AlunoService --> MatriculaGenerator : usa
+
+' Auth
+AuthenticationService --> AlunoRepository
+AuthenticationService --> ProfessorRepository
+AuthenticationService --> AtendenteRepository
+AuthenticationService --> AdministradorRepository
+AuthenticationService --> LoginHistoryRepository
+AuthenticationService --> PasswordHasher
+AuthenticationService ..> AuthResult : retorna
+AuthResult --> TipoEntidade
+
+' Proxy -> SessionContext
+RepositoryProxy ..> SessionContext : verifica permissao
+
+' UI -> Facade / Services
+MenuPrincipal --> MenuLogin : cria
+MenuPrincipal ..> MenuAdministrador : encaminha
+MenuPrincipal ..> MenuAtendente : encaminha
+MenuPrincipal ..> MenuProfessor : encaminha
+MenuPrincipal ..> MenuAluno : encaminha
+MenuLogin --> AuthenticationService : autentica
+MenuAdministrador --> AcademiaFacade : usa
+MenuAtendente --> AcademiaFacade : usa
+MenuProfessor --> AcademiaFacade : usa
+MenuAluno --> AcademiaFacade : usa
+MenuAdministrador --> MenuCadastrarUsuario : abre
+MenuAdministrador --> MenuListarUsuario : abre
+MenuAtendente --> MenuCadastrarUsuario : abre
+MenuCadastrarUsuario --> Command : delega
+MenuListarUsuario --> Command : delega
+MenuAdministrador --> HistoricoOperacoes : desfazer
+MenuAdministrador ..> HTMLRelatorio : gera
+MenuAdministrador ..> PDFRelatorio : gera
+
+' Commands -> Facade
+CadastrarAlunoCommand --> AcademiaFacade : usa
+DesfazerCommand --> HistoricoOperacoes : desfaz
+ListarUsuariosCommand --> AcademiaFacade : usa
+
+' Relatorio -> Facade + LoginHistory
+RelatorioTemplate ..> AcademiaFacade : consulta
+RelatorioTemplate ..> LoginHistoryRepository : consulta
+
+' Turma/Treino relationships
+Turma "0..*" --> "1" Professor : professorId
+Turma "0..*" -- "0..*" Aluno : turma_alunos
+Treino "0..*" --> "1" Aluno : alunoId
+
+' Validation used in services
+AlunoService ..> LoginValidator : valida
+AlunoService ..> SenhaValidator : valida
+AlunoService ..> EmailValidator : valida
+AlunoService ..> DataNascimentoValidator : valida
+ProfessorService ..> IdadeMinimaPredicate : valida (>= 18)
+
+' DatabaseConnection
+DatabaseConnection --> SqliteRepositoryFactory : fornece Connection
+
+@enduml
