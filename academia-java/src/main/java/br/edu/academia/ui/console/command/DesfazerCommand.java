@@ -1,7 +1,7 @@
 package br.edu.academia.ui.console.command;
 
-import br.edu.academia.domain.memento.CadastroMemento;
 import br.edu.academia.domain.memento.HistoricoOperacoes;
+import br.edu.academia.domain.memento.OperacaoMemento;
 import br.edu.academia.ui.console.ConsoleUtils;
 
 import java.util.Optional;
@@ -24,9 +24,9 @@ public class DesfazerCommand implements Command {
             return;
         }
 
-        Optional<CadastroMemento> desfeito = historico.desfazer();
+        Optional<OperacaoMemento> desfeito = historico.desfazer();
         desfeito.ifPresent(m ->
-                System.out.println("Cadastro desfeito: " + m.getDescricao()));
+                System.out.println("Operacao desfeita [" + m.getTipoOperacao() + "]: " + m.getDescricao()));
         console.waitForEnter();
     }
 }

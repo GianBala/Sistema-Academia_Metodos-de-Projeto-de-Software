@@ -1,9 +1,13 @@
 package br.edu.academia.ui.console;
 
-import br.edu.academia.ui.console.command.*;
+import br.edu.academia.ui.console.command.Command;
 
 import java.util.Map;
 
+/**
+ * Menu de cadastro — exibe opções e delega ao Command correspondente.
+ * Mantido para compatibilidade com a estrutura de Commands.
+ */
 public class MenuCadastrarUsuario {
 
     private final Map<String, Command> comandos;
