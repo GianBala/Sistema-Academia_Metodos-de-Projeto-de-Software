@@ -9,42 +9,33 @@ import static org.junit.jupiter.api.Assertions.*;
 class ProfessorTest {
 
     @Test
-    void deveAdicionarAlunoAoProfessor() {
+    void deveCriarProfessorComBuilder() {
         Professor professor = new Professor.Builder()
                 .nome("Prof Carlos")
                 .dataNascimento(LocalDate.of(1980, 1, 1))
                 .email("prof@email.com")
+                .login("profcarlos")
+                .senhaHash("hash")
                 .build();
 
-        Aluno aluno = new Aluno.Builder()
-                .nome("Aluno Teste")
-                .dataNascimento(LocalDate.of(2000, 1, 1))
-                .email("aluno@email.com")
-                .matricula(1)
-                .build();
-
-        professor.adicionarAluno(aluno);
-
-        assertEquals(1, professor.getAlunos().size());
-        assertEquals("Aluno Teste", professor.getAlunos().get(0).getNome());
+        assertEquals("Prof Carlos", professor.getNome());
+        assertEquals("prof@email.com", professor.getEmail());
+        assertEquals("profcarlos", professor.getLogin());
     }
 
     @Test
-    void listaDeAlunosDeveSerImutavel() {
+    void infosDeveConterProfessor() {
         Professor professor = new Professor.Builder()
-                .nome("Prof")
-                .dataNascimento(LocalDate.of(1980, 1, 1))
-                .email("prof@email.com")
+                .nome("Dr Ana")
+                .dataNascimento(LocalDate.of(1975, 6, 10))
+                .email("ana@email.com")
+                .login("profdrana")
+                .senhaHash("hash")
                 .build();
 
-        Aluno aluno = new Aluno.Builder()
-                .nome("X")
-                .dataNascimento(LocalDate.now())
-                .email("x@e.com")
-                .matricula(1)
-                .build();
+        String infos = professor.infos();
 
-        assertThrows(UnsupportedOperationException.class, () ->
-                professor.getAlunos().add(aluno));
+        assertTrue(infos.contains("Dr Ana"));
+        assertTrue(infos.contains("Professor"));
     }
 }

@@ -15,6 +15,8 @@ class AlunoTest {
                 .dataNascimento(LocalDate.of(2000, 5, 15))
                 .email("carlos@email.com")
                 .matricula(1234)
+                .login("carloslog")
+                .senhaHash("hash")
                 .build();
 
         assertEquals("Carlos", aluno.getNome());
@@ -29,6 +31,8 @@ class AlunoTest {
                 .dataNascimento(LocalDate.of(1999, 3, 20))
                 .email("ana@email.com")
                 .matricula(5678)
+                .login("analog")
+                .senhaHash("hash")
                 .build();
 
         assertTrue(aluno.infos().contains("5678"));

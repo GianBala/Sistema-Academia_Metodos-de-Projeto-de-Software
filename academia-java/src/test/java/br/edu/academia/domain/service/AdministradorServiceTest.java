@@ -2,40 +2,25 @@ package br.edu.academia.domain.service;
 
 import br.edu.academia.domain.entity.Administrador;
 import br.edu.academia.domain.memento.HistoricoOperacoes;
-import br.edu.academia.domain.memento.TipoEntidade;
-import br.edu.academia.domain.repository.AdministradorRepository;
-import br.edu.academia.infrastructure.security.PasswordHasher;
+import br.edu.academia.testutil.TestStubs;
+import br.edu.academia.testutil.TestStubs.*;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
 
 class AdministradorServiceTest {
 
     private AdministradorService service;
-    private InMemoryAdminRepository repository;
+    private InMemoryAdministradorRepository repository;
 
     @BeforeEach
     void setUp() {
-        repository = new InMemoryAdminRepository();
-        PasswordHasher hasher = new PasswordHasher() {
-            @Override
-            public String hash(String plaintext) {
-                return "hashed_" + plaintext;
-            }
-
-            @Override
-            public boolean verify(String plaintext, String hash) {
-                return hash.equals("hashed_" + plaintext);
-            }
-        };
-        var historico = new HistoricoOperacoes(Map.of(TipoEntidade.ADMINISTRADOR, repository));
-        service = new AdministradorService(repository, hasher, historico);
+        repository = new InMemoryAdministradorRepository();
+        service    = new AdministradorService(repository,
+                new FakePasswordHasher(),
+                new HistoricoOperacoes(),
+                new NoOpLogger());
     }
 
     @Test
@@ -51,51 +36,53 @@ class AdministradorServiceTest {
 
     @Test
     void deveRejeitarLoginComNumeros() {
-        assertThrows(IllegalArgumentException.class,
-                () -> service.cadastrar("Admin", "01/01/1990", "a@e.com", "admin123", "Senha123!"));
+        assertThrows(IllegalArgumentException.class, () ->
+                service.cadastrar("Admin", "01/01/1990", "a@e.com", "admin123", "Senha123!"));
     }
 
     @Test
     void deveRejeitarSenhaFraca() {
-        assertThrows(IllegalArgumentException.class,
-                () -> service.cadastrar("Admin", "01/01/1990", "a@e.com", "admin", "abc"));
+        assertThrows(IllegalArgumentException.class, () ->
+                service.cadastrar("Admin", "01/01/1990", "a@e.com", "admin", "abc"));
     }
 
     @Test
     void deveRejeitarLoginMuitoLongo() {
-        assertThrows(IllegalArgumentException.class,
-                () -> service.cadastrar("Admin", "01/01/1990", "a@e.com",
+        assertThrows(IllegalArgumentException.class, () ->
+                service.cadastrar("Admin", "01/01/1990", "a@e.com",
                         "loginmuitolongo", "Senha123!"));
     }
 
-    static class InMemoryAdminRepository implements AdministradorRepository {
-        private final List<Administrador> admins = new ArrayList<>();
-        private long nextId = 1;
+    @Test
+    void deveAtualizarAdministrador() {
+        Administrador admin = service.cadastrar("Original", "01/01/1990",
+                "orig@email.com", "origlogin", "Senha123!");
 
-        @Override
-        public void save(Administrador admin) {
-            admin.setId(nextId++);
-            admins.add(admin);
-        }
+        Administrador atualizado = service.atualizar(admin.getId(), "Novo Nome",
+                "01/01/1990", "novo@email.com", "novologin", "Senha123!");
 
-        @Override
-        public List<Administrador> findAll() {
-            return new ArrayList<>(admins);
-        }
+        assertEquals("Novo Nome", atualizado.getNome());
+    }
 
-        @Override
-        public Optional<Administrador> findById(long id) {
-            return admins.stream().filter(a -> a.getId() == id).findFirst();
-        }
+    @Test
+    void deveDeletarAdministrador() {
+        Administrador admin = service.cadastrar("Delete Me", "01/01/1990",
+                "del@email.com", "dellogin", "Senha123!");
 
-        @Override
-        public Optional<Administrador> findByLogin(String login) {
-            return admins.stream().filter(a -> a.getLogin().equals(login)).findFirst();
-        }
+        service.deletar(admin.getId());
 
-        @Override
-        public void delete(long id) {
-            admins.removeIf(a -> a.getId() == id);
-        }
+        assertTrue(repository.findAll().isEmpty());
+    }
+
+    @Test
+    void deveLancarExcecaoAoAtualizarInexistente() {
+        assertThrows(IllegalArgumentException.class, () ->
+                service.atualizar(999L, "Nome", "01/01/1990",
+                        "a@e.com", "login", "Senha123!"));
+    }
+
+    @Test
+    void deveLancarExcecaoAoDeletarInexistente() {
+        assertThrows(IllegalArgumentException.class, () -> service.deletar(999L));
     }
 }

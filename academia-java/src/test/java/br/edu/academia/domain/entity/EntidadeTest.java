@@ -15,6 +15,8 @@ class EntidadeTest {
                 .dataNascimento(LocalDate.now().minusYears(25))
                 .email("teste@email.com")
                 .matricula(1)
+                .login("testlogin")
+                .senhaHash("hash")
                 .build();
 
         assertEquals(25, aluno.getIdade());
@@ -27,6 +29,8 @@ class EntidadeTest {
                 .dataNascimento(LocalDate.of(2000, 1, 1))
                 .email("joao@email.com")
                 .matricula(1)
+                .login("testlogin")
+                .senhaHash("hash")
                 .build();
 
         assertEquals("Joao Silva", aluno.getNome());
@@ -39,6 +43,8 @@ class EntidadeTest {
                 .dataNascimento(LocalDate.of(2000, 1, 1))
                 .email("maria@email.com")
                 .matricula(123)
+                .login("marialog")
+                .senhaHash("hash")
                 .build();
 
         String infos = aluno.infos();
@@ -56,6 +62,8 @@ class EntidadeTest {
                 .dataNascimento(LocalDate.of(2000, 1, 1))
                 .email("t@e.com")
                 .matricula(1)
+                .login("testlogin")
+                .senhaHash("hash")
                 .build();
         aluno.setId(42);
 

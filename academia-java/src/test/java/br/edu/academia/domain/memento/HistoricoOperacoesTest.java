@@ -1,12 +1,12 @@
 package br.edu.academia.domain.memento;
 
-import br.edu.academia.domain.entity.Aluno;
-import br.edu.academia.domain.repository.AlunoRepository;
-import br.edu.academia.domain.repository.Repository;
+import br.edu.academia.testutil.TestStubs;
+import br.edu.academia.testutil.TestStubs.InMemoryAlunoRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import java.util.*;
+import java.util.Optional;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -17,9 +17,8 @@ class HistoricoOperacoesTest {
 
     @BeforeEach
     void setUp() {
+        historico = new HistoricoOperacoes();
         repository = new InMemoryAlunoRepository();
-        Map<TipoEntidade, Repository<?>> repos = Map.of(TipoEntidade.ALUNO, repository);
-        historico = new HistoricoOperacoes(repos);
     }
 
     @Test
@@ -29,85 +28,64 @@ class HistoricoOperacoesTest {
 
     @Test
     void deveRetornarTrueAposRegistrar() {
-        historico.registrar(new CadastroMemento(1L, TipoEntidade.ALUNO, "Aluno: Maria"));
+        historico.registrar(new OperacaoMemento(TipoOperacao.CRIACAO, "desc", () -> {}));
         assertTrue(historico.temHistorico());
     }
 
     @Test
     void deveRetornarOptionalVazioAoDesfazerSemHistorico() {
-        Optional<CadastroMemento> resultado = historico.desfazer();
+        Optional<OperacaoMemento> resultado = historico.desfazer();
         assertTrue(resultado.isEmpty());
     }
 
     @Test
-    void deveDesfazerCadastroEDeletarEntidade() {
-        repository.save(criarAlunoComId(1L));
+    void deveDesfazerExecutandoAcao() {
+        var aluno = TestStubs.criarAluno("Maria", 1);
+        repository.save(aluno);
         assertEquals(1, repository.findAll().size());
 
-        historico.registrar(new CadastroMemento(1L, TipoEntidade.ALUNO, "Aluno: Maria"));
-        Optional<CadastroMemento> resultado = historico.desfazer();
+        long id = aluno.getId();
+        historico.registrar(new OperacaoMemento(
+                TipoOperacao.CRIACAO, "Cadastro: Maria", () -> repository.delete(id)));
+
+        Optional<OperacaoMemento> resultado = historico.desfazer();
 
         assertTrue(resultado.isPresent());
-        assertEquals("Aluno: Maria", resultado.get().getDescricao());
+        assertEquals("Cadastro: Maria", resultado.get().getDescricao());
         assertEquals(0, repository.findAll().size());
         assertFalse(historico.temHistorico());
     }
 
     @Test
     void deveDesfazerEmOrdemLIFO() {
-        repository.save(criarAlunoComId(1L));
-        repository.save(criarAlunoComId(2L));
+        AtomicInteger contador = new AtomicInteger(0);
 
-        historico.registrar(new CadastroMemento(1L, TipoEntidade.ALUNO, "Aluno: Primeiro"));
-        historico.registrar(new CadastroMemento(2L, TipoEntidade.ALUNO, "Aluno: Segundo"));
+        historico.registrar(new OperacaoMemento(TipoOperacao.CRIACAO, "Primeiro", () -> contador.set(1)));
+        historico.registrar(new OperacaoMemento(TipoOperacao.CRIACAO, "Segundo",  () -> contador.set(2)));
 
-        Optional<CadastroMemento> primeiro = historico.desfazer();
+        // Primeiro desfazer deve executar "Segundo" (topo do stack)
+        Optional<OperacaoMemento> primeiro = historico.desfazer();
         assertTrue(primeiro.isPresent());
-        assertEquals("Aluno: Segundo", primeiro.get().getDescricao());
+        assertEquals("Segundo", primeiro.get().getDescricao());
+        assertEquals(2, contador.get());
 
-        Optional<CadastroMemento> segundo = historico.desfazer();
+        // Segundo desfazer deve executar "Primeiro"
+        Optional<OperacaoMemento> segundo = historico.desfazer();
         assertTrue(segundo.isPresent());
-        assertEquals("Aluno: Primeiro", segundo.get().getDescricao());
+        assertEquals("Primeiro", segundo.get().getDescricao());
+        assertEquals(1, contador.get());
 
-        assertEquals(0, repository.findAll().size());
+        assertFalse(historico.temHistorico());
     }
 
-    private Aluno criarAlunoComId(long id) {
-        Aluno aluno = new Aluno.Builder()
-                .nome("Aluno " + id)
-                .dataNascimento(java.time.LocalDate.of(2000, 1, 1))
-                .email("aluno" + id + "@email.com")
-                .matricula((int) id)
-                .build();
-        aluno.setId(id);
-        return aluno;
-    }
-
-    static class InMemoryAlunoRepository implements AlunoRepository {
-        private final List<Aluno> alunos = new ArrayList<>();
-
-        public void save(Aluno aluno) {
-            alunos.add(aluno);
-        }
-
-        @Override
-        public List<Aluno> findAll() {
-            return new ArrayList<>(alunos);
-        }
-
-        @Override
-        public Optional<Aluno> findById(long id) {
-            return alunos.stream().filter(a -> a.getId() == id).findFirst();
-        }
-
-        @Override
-        public Optional<Aluno> findByMatricula(int matricula) {
-            return alunos.stream().filter(a -> a.getMatricula() == matricula).findFirst();
-        }
-
-        @Override
-        public void delete(long id) {
-            alunos.removeIf(a -> a.getId() == id);
-        }
+    @Test
+    void tamanhoDeveRefletirRegistros() {
+        assertEquals(0, historico.tamanho());
+        historico.registrar(new OperacaoMemento(TipoOperacao.CRIACAO, "A", () -> {}));
+        assertEquals(1, historico.tamanho());
+        historico.registrar(new OperacaoMemento(TipoOperacao.ATUALIZACAO, "B", () -> {}));
+        assertEquals(2, historico.tamanho());
+        historico.desfazer();
+        assertEquals(1, historico.tamanho());
     }
 }

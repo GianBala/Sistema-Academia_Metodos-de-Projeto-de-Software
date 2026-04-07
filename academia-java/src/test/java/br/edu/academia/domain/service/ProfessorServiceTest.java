@@ -2,16 +2,13 @@ package br.edu.academia.domain.service;
 
 import br.edu.academia.domain.entity.Professor;
 import br.edu.academia.domain.memento.HistoricoOperacoes;
-import br.edu.academia.domain.memento.TipoEntidade;
-import br.edu.academia.domain.repository.ProfessorRepository;
+import br.edu.academia.testutil.TestStubs;
+import br.edu.academia.testutil.TestStubs.*;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.time.format.DateTimeFormatter;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -20,19 +17,23 @@ class ProfessorServiceTest {
     private ProfessorService service;
     private InMemoryProfessorRepository repository;
 
+    private static final DateTimeFormatter FMT = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+
     @BeforeEach
     void setUp() {
         repository = new InMemoryProfessorRepository();
-        var historico = new HistoricoOperacoes(Map.of(TipoEntidade.PROFESSOR, repository));
-        service = new ProfessorService(repository, historico);
+        service    = new ProfessorService(repository,
+                new FakePasswordHasher(),
+                new HistoricoOperacoes(),
+                new NoOpLogger());
     }
 
     @Test
     void deveCadastrarProfessorMaiorDe18() {
-        String dataNascimento = LocalDate.now().minusYears(30).format(
-                java.time.format.DateTimeFormatter.ofPattern("dd/MM/yyyy"));
+        String data = LocalDate.now().minusYears(30).format(FMT);
 
-        Professor prof = service.cadastrar("Carlos", dataNascimento, "carlos@email.com");
+        Professor prof = service.cadastrar("Carlos", data,
+                TestStubs.VALID_EMAIL, TestStubs.VALID_LOGIN, TestStubs.VALID_PASSWORD);
 
         assertEquals("Carlos", prof.getNome());
         assertEquals(1, repository.findAll().size());
@@ -40,45 +41,67 @@ class ProfessorServiceTest {
 
     @Test
     void deveRejeitarProfessorMenorDe18() {
-        String dataNascimento = LocalDate.now().minusYears(17).format(
-                java.time.format.DateTimeFormatter.ofPattern("dd/MM/yyyy"));
+        String data = LocalDate.now().minusYears(17).format(FMT);
 
-        assertThrows(IllegalArgumentException.class,
-                () -> service.cadastrar("Jovem", dataNascimento, "jovem@email.com"));
+        assertThrows(IllegalArgumentException.class, () ->
+                service.cadastrar("Jovem", data,
+                        TestStubs.VALID_EMAIL, TestStubs.VALID_LOGIN, TestStubs.VALID_PASSWORD));
     }
 
     @Test
     void deveRejeitarEmailInvalido() {
-        String dataNascimento = LocalDate.now().minusYears(30).format(
-                java.time.format.DateTimeFormatter.ofPattern("dd/MM/yyyy"));
-
-        assertThrows(IllegalArgumentException.class,
-                () -> service.cadastrar("Carlos", dataNascimento, "invalido"));
+        assertThrows(IllegalArgumentException.class, () ->
+                service.cadastrar("Carlos", TestStubs.VALID_DATE,
+                        "invalido", TestStubs.VALID_LOGIN, TestStubs.VALID_PASSWORD));
     }
 
-    static class InMemoryProfessorRepository implements ProfessorRepository {
-        private final List<Professor> professores = new ArrayList<>();
-        private long nextId = 1;
+    @Test
+    void deveRejeitarLoginComNumeros() {
+        assertThrows(IllegalArgumentException.class, () ->
+                service.cadastrar("Carlos", TestStubs.VALID_DATE,
+                        TestStubs.VALID_EMAIL, "log123", TestStubs.VALID_PASSWORD));
+    }
 
-        @Override
-        public void save(Professor professor) {
-            professor.setId(nextId++);
-            professores.add(professor);
-        }
+    @Test
+    void deveRejeitarSenhaFraca() {
+        assertThrows(IllegalArgumentException.class, () ->
+                service.cadastrar("Carlos", TestStubs.VALID_DATE,
+                        TestStubs.VALID_EMAIL, TestStubs.VALID_LOGIN, "fraca"));
+    }
 
-        @Override
-        public List<Professor> findAll() {
-            return new ArrayList<>(professores);
-        }
+    @Test
+    void deveListarTodos() {
+        service.cadastrar("Prof A", TestStubs.VALID_DATE, "a@email.com", "profaaa", TestStubs.VALID_PASSWORD);
+        service.cadastrar("Prof B", TestStubs.VALID_DATE, "b@email.com", "profbbb", TestStubs.VALID_PASSWORD);
 
-        @Override
-        public Optional<Professor> findById(long id) {
-            return professores.stream().filter(p -> p.getId() == id).findFirst();
-        }
+        assertEquals(2, service.listarTodos().size());
+    }
 
-        @Override
-        public void delete(long id) {
-            professores.removeIf(p -> p.getId() == id);
-        }
+    @Test
+    void deveAtualizarProfessor() {
+        Professor prof = service.cadastrar("Original", TestStubs.VALID_DATE,
+                TestStubs.VALID_EMAIL, TestStubs.VALID_LOGIN, TestStubs.VALID_PASSWORD);
+
+        Professor atualizado = service.atualizar(prof.getId(), "Novo Nome",
+                TestStubs.VALID_DATE, "novo@email.com", "novologin", TestStubs.VALID_PASSWORD);
+
+        assertEquals("Novo Nome", atualizado.getNome());
+    }
+
+    @Test
+    void deveDeletarProfessor() {
+        Professor prof = service.cadastrar("Para Deletar", TestStubs.VALID_DATE,
+                TestStubs.VALID_EMAIL, TestStubs.VALID_LOGIN, TestStubs.VALID_PASSWORD);
+
+        service.deletar(prof.getId());
+
+        assertTrue(repository.findAll().isEmpty());
+    }
+
+    @Test
+    void deveLancarExcecaoAoAtualizarInexistente() {
+        assertThrows(IllegalArgumentException.class, () ->
+                service.atualizar(999L, "Nome", TestStubs.VALID_DATE,
+                        TestStubs.VALID_EMAIL, TestStubs.VALID_LOGIN, TestStubs.VALID_PASSWORD));
     }
 }
