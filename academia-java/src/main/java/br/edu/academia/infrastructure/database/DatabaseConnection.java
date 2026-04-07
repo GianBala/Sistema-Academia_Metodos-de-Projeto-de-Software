@@ -21,7 +21,7 @@ public class DatabaseConnection {
         this(DB_URL);
     }
 
-    DatabaseConnection(String url) {
+    public DatabaseConnection(String url) {
         try {
             this.connection = DriverManager.getConnection(url);
             initializeSchema();

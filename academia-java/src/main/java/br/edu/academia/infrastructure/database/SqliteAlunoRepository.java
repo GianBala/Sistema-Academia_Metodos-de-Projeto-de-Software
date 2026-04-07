@@ -19,18 +19,17 @@ public class SqliteAlunoRepository implements AlunoRepository {
 
     @Override
     public void save(Aluno aluno) {
-        String sql = "INSERT INTO alunos (nome, dt_nascimento, email, matricula) VALUES (?, ?, ?, ?)";
+        String sql = "INSERT INTO alunos (nome, dt_nascimento, email, matricula, login, senha_hash) VALUES (?, ?, ?, ?, ?, ?)";
         try (PreparedStatement stmt = connection.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
             stmt.setString(1, aluno.getNome());
             stmt.setString(2, aluno.getDataNascimento().toString());
             stmt.setString(3, aluno.getEmail());
             stmt.setInt(4, aluno.getMatricula());
+            stmt.setString(5, aluno.getLogin());
+            stmt.setString(6, aluno.getSenhaHash());
             stmt.executeUpdate();
-
             try (ResultSet keys = stmt.getGeneratedKeys()) {
-                if (keys.next()) {
-                    aluno.setId(keys.getLong(1));
-                }
+                if (keys.next()) aluno.setId(keys.getLong(1));
             }
         } catch (SQLException e) {
             throw new RuntimeException("Erro ao salvar aluno.", e);
@@ -39,13 +38,10 @@ public class SqliteAlunoRepository implements AlunoRepository {
 
     @Override
     public List<Aluno> findAll() {
-        String sql = "SELECT id, nome, dt_nascimento, email, matricula FROM alunos";
+        String sql = "SELECT id, nome, dt_nascimento, email, matricula, login, senha_hash FROM alunos";
         List<Aluno> alunos = new ArrayList<>();
-        try (Statement stmt = connection.createStatement();
-             ResultSet rs = stmt.executeQuery(sql)) {
-            while (rs.next()) {
-                alunos.add(mapRow(rs));
-            }
+        try (Statement stmt = connection.createStatement(); ResultSet rs = stmt.executeQuery(sql)) {
+            while (rs.next()) alunos.add(mapRow(rs));
         } catch (SQLException e) {
             throw new RuntimeException("Erro ao listar alunos.", e);
         }
@@ -54,13 +50,11 @@ public class SqliteAlunoRepository implements AlunoRepository {
 
     @Override
     public Optional<Aluno> findById(long id) {
-        String sql = "SELECT id, nome, dt_nascimento, email, matricula FROM alunos WHERE id = ?";
+        String sql = "SELECT id, nome, dt_nascimento, email, matricula, login, senha_hash FROM alunos WHERE id = ?";
         try (PreparedStatement stmt = connection.prepareStatement(sql)) {
             stmt.setLong(1, id);
             try (ResultSet rs = stmt.executeQuery()) {
-                if (rs.next()) {
-                    return Optional.of(mapRow(rs));
-                }
+                if (rs.next()) return Optional.of(mapRow(rs));
             }
         } catch (SQLException e) {
             throw new RuntimeException("Erro ao buscar aluno por id.", e);
@@ -70,16 +64,28 @@ public class SqliteAlunoRepository implements AlunoRepository {
 
     @Override
     public Optional<Aluno> findByMatricula(int matricula) {
-        String sql = "SELECT id, nome, dt_nascimento, email, matricula FROM alunos WHERE matricula = ?";
+        String sql = "SELECT id, nome, dt_nascimento, email, matricula, login, senha_hash FROM alunos WHERE matricula = ?";
         try (PreparedStatement stmt = connection.prepareStatement(sql)) {
             stmt.setInt(1, matricula);
             try (ResultSet rs = stmt.executeQuery()) {
-                if (rs.next()) {
-                    return Optional.of(mapRow(rs));
-                }
+                if (rs.next()) return Optional.of(mapRow(rs));
             }
         } catch (SQLException e) {
             throw new RuntimeException("Erro ao buscar aluno por matricula.", e);
+        }
+        return Optional.empty();
+    }
+
+    @Override
+    public Optional<Aluno> findByLogin(String login) {
+        String sql = "SELECT id, nome, dt_nascimento, email, matricula, login, senha_hash FROM alunos WHERE login = ?";
+        try (PreparedStatement stmt = connection.prepareStatement(sql)) {
+            stmt.setString(1, login);
+            try (ResultSet rs = stmt.executeQuery()) {
+                if (rs.next()) return Optional.of(mapRow(rs));
+            }
+        } catch (SQLException e) {
+            throw new RuntimeException("Erro ao buscar aluno por login.", e);
         }
         return Optional.empty();
     }
@@ -97,13 +103,15 @@ public class SqliteAlunoRepository implements AlunoRepository {
 
     @Override
     public void update(Aluno aluno) {
-        String sql = "UPDATE alunos SET nome = ?, dt_nascimento = ?, email = ?, matricula = ? WHERE id = ?";
+        String sql = "UPDATE alunos SET nome = ?, dt_nascimento = ?, email = ?, matricula = ?, login = ?, senha_hash = ? WHERE id = ?";
         try (PreparedStatement stmt = connection.prepareStatement(sql)) {
             stmt.setString(1, aluno.getNome());
             stmt.setString(2, aluno.getDataNascimento().toString());
             stmt.setString(3, aluno.getEmail());
             stmt.setInt(4, aluno.getMatricula());
-            stmt.setLong(5, aluno.getId());
+            stmt.setString(5, aluno.getLogin());
+            stmt.setString(6, aluno.getSenhaHash());
+            stmt.setLong(7, aluno.getId());
             stmt.executeUpdate();
         } catch (SQLException e) {
             throw new RuntimeException("Erro ao atualizar aluno.", e);
@@ -112,11 +120,13 @@ public class SqliteAlunoRepository implements AlunoRepository {
 
     private Aluno mapRow(ResultSet rs) throws SQLException {
         Aluno aluno = new Aluno.Builder()
-            .nome(rs.getString("nome"))
-            .dataNascimento(LocalDate.parse(rs.getString("dt_nascimento")))
-            .email(rs.getString("email"))
-            .matricula(rs.getInt("matricula"))
-            .build();
+                .nome(rs.getString("nome"))
+                .dataNascimento(LocalDate.parse(rs.getString("dt_nascimento")))
+                .email(rs.getString("email"))
+                .matricula(rs.getInt("matricula"))
+                .login(rs.getString("login"))
+                .senhaHash(rs.getString("senha_hash"))
+                .build();
         aluno.setId(rs.getLong("id"));
         return aluno;
     }

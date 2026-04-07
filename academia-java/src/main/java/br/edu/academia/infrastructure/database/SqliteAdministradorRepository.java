@@ -27,11 +27,8 @@ public class SqliteAdministradorRepository implements AdministradorRepository {
             stmt.setString(4, admin.getLogin());
             stmt.setString(5, admin.getSenhaHash());
             stmt.executeUpdate();
-
             try (ResultSet keys = stmt.getGeneratedKeys()) {
-                if (keys.next()) {
-                    admin.setId(keys.getLong(1));
-                }
+                if (keys.next()) admin.setId(keys.getLong(1));
             }
         } catch (SQLException e) {
             throw new RuntimeException("Erro ao salvar administrador.", e);
@@ -42,11 +39,8 @@ public class SqliteAdministradorRepository implements AdministradorRepository {
     public List<Administrador> findAll() {
         String sql = "SELECT id, nome, dt_nascimento, email, login, senha_hash FROM administradores";
         List<Administrador> admins = new ArrayList<>();
-        try (Statement stmt = connection.createStatement();
-             ResultSet rs = stmt.executeQuery(sql)) {
-            while (rs.next()) {
-                admins.add(mapRow(rs));
-            }
+        try (Statement stmt = connection.createStatement(); ResultSet rs = stmt.executeQuery(sql)) {
+            while (rs.next()) admins.add(mapRow(rs));
         } catch (SQLException e) {
             throw new RuntimeException("Erro ao listar administradores.", e);
         }
@@ -59,9 +53,7 @@ public class SqliteAdministradorRepository implements AdministradorRepository {
         try (PreparedStatement stmt = connection.prepareStatement(sql)) {
             stmt.setLong(1, id);
             try (ResultSet rs = stmt.executeQuery()) {
-                if (rs.next()) {
-                    return Optional.of(mapRow(rs));
-                }
+                if (rs.next()) return Optional.of(mapRow(rs));
             }
         } catch (SQLException e) {
             throw new RuntimeException("Erro ao buscar administrador por id.", e);
@@ -75,9 +67,7 @@ public class SqliteAdministradorRepository implements AdministradorRepository {
         try (PreparedStatement stmt = connection.prepareStatement(sql)) {
             stmt.setString(1, login);
             try (ResultSet rs = stmt.executeQuery()) {
-                if (rs.next()) {
-                    return Optional.of(mapRow(rs));
-                }
+                if (rs.next()) return Optional.of(mapRow(rs));
             }
         } catch (SQLException e) {
             throw new RuntimeException("Erro ao buscar administrador por login.", e);
@@ -114,12 +104,12 @@ public class SqliteAdministradorRepository implements AdministradorRepository {
 
     private Administrador mapRow(ResultSet rs) throws SQLException {
         Administrador admin = new Administrador.Builder()
-            .nome(rs.getString("nome"))
-            .dataNascimento(LocalDate.parse(rs.getString("dt_nascimento")))
-            .email(rs.getString("email"))
-            .login(rs.getString("login"))
-            .senhaHash(rs.getString("senha_hash"))
-            .build();
+                .nome(rs.getString("nome"))
+                .dataNascimento(LocalDate.parse(rs.getString("dt_nascimento")))
+                .email(rs.getString("email"))
+                .login(rs.getString("login"))
+                .senhaHash(rs.getString("senha_hash"))
+                .build();
         admin.setId(rs.getLong("id"));
         return admin;
     }

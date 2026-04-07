@@ -31,4 +31,19 @@ public class SqliteRepositoryFactory extends RepositoryFactory {
     public AdministradorRepository createAdministradorRepository() {
         return new SqliteAdministradorRepository(connection);
     }
+
+    @Override
+    public TurmaRepository createTurmaRepository() {
+        return new SqliteTurmaRepository(connection);
+    }
+
+    @Override
+    public TreinoRepository createTreinoRepository() {
+        return new SqliteTreinoRepository(connection);
+    }
+
+    @Override
+    public LoginHistoryRepository createLoginHistoryRepository() {
+        return new SqliteLoginHistoryRepository(connection);
+    }
 }

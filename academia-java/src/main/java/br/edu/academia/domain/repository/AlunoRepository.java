@@ -6,4 +6,5 @@ import java.util.Optional;
 
 public interface AlunoRepository extends Repository<Aluno> {
     Optional<Aluno> findByMatricula(int matricula);
+    Optional<Aluno> findByLogin(String login);
 }
