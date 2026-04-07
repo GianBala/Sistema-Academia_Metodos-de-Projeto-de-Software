@@ -1,24 +1,14 @@
 package br.edu.academia.domain.entity;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-
+/**
+ * Professor do sistema.
+ * Pertence a uma ou mais Turmas (gerenciadas via TurmaService/DB).
+ * login/senhaHash herdados de Entidade.
+ */
 public class Professor extends Funcionario {
-
-    private final List<Aluno> alunos;
 
     private Professor(Builder builder) {
         super(builder);
-        this.alunos = new ArrayList<>();
-    }
-
-    public void adicionarAluno(Aluno aluno) {
-        alunos.add(aluno);
-    }
-
-    public List<Aluno> getAlunos() {
-        return Collections.unmodifiableList(alunos);
     }
 
     @Override
